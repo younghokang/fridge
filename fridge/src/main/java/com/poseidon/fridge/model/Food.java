@@ -7,7 +7,7 @@ public class Food implements Cloneable {
     private String name;
     private int quantity;
     private String expiryDate;
-
+    
     public Food(String name, int quantity, String expiryDate) {
         this.name = name;
         this.quantity = quantity;

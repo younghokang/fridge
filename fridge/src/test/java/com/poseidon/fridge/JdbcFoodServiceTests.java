@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.poseidon.fridge.model.Food;
-import com.poseidon.fridge.repository.JdbcFoodRepository;
 import com.poseidon.fridge.service.JdbcFoodService;
 
 @RunWith(SpringRunner.class)
@@ -23,12 +22,9 @@ public class JdbcFoodServiceTests {
     @Autowired
     private JdbcFoodService jdbcFoodService;
     
-    @Autowired
-    private JdbcFoodRepository jdbcFoodRepository;
-    
     @Before
     public void setUp() {
-        jdbcFoodRepository.deleteAll();
+        jdbcFoodService.removeAll();
     }
     
     @Test

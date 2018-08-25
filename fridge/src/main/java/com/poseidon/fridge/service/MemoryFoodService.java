@@ -47,4 +47,9 @@ public class MemoryFoodService implements FoodService {
         return null;
     }
 
+    @Override
+    public void removeAll() {
+        foods.clear();
+    }
+
 }

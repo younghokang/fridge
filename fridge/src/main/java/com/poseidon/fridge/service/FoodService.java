@@ -9,4 +9,5 @@ public interface FoodService {
     Food save(Food food);
     boolean remove(Food food);
     Food findById(Long id);
+    void removeAll();
 }

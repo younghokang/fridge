@@ -11,7 +11,6 @@ public class MemoryFoodService implements FoodService {
     private List<Food> foods = new ArrayList<>();
     private AtomicLong atomicLong = new AtomicLong();
 
-    @Override
     public List<Food> findAll() {
         List<Food> cloneFoods = new ArrayList<>();
         for(Food food : foods) {
@@ -37,7 +36,6 @@ public class MemoryFoodService implements FoodService {
         return foods.remove(food);
     }
 
-    @Override
     public Food findById(Long id) {
         for(Food food : foods) {
             if(food.getId() == id) {

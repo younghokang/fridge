@@ -1,13 +1,16 @@
 package com.poseidon.fridge.service;
 
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.poseidon.fridge.model.Food;
 
 public interface FoodService {
-    List<Food> findAll();
+    @Transactional
     Food save(Food food);
+    
+    @Transactional
     boolean remove(Food food);
-    Food findById(Long id);
+    
+    @Transactional
     void removeAll();
 }

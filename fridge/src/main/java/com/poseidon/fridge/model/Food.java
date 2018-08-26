@@ -1,12 +1,24 @@
 package com.poseidon.fridge.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.google.common.base.Objects;
 
+@Entity
+@Table(name="food")
 public class Food implements Cloneable {
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String name;
     private int quantity;
     private String expiryDate;
+    
+    public Food() {}
     
     public Food(String name, int quantity, String expiryDate) {
         this.name = name;

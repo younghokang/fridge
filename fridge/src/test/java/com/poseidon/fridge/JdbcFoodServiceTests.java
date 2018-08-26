@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.poseidon.fridge.model.Food;
+import com.poseidon.fridge.repository.JdbcFoodRepository;
 import com.poseidon.fridge.service.JdbcFoodService;
 
 @RunWith(SpringRunner.class)
@@ -21,6 +22,9 @@ public class JdbcFoodServiceTests {
     
     @Autowired
     private JdbcFoodService jdbcFoodService;
+    
+    @Autowired
+    private JdbcFoodRepository jdbcFoodRepository;
     
     @Before
     public void setUp() {
@@ -36,7 +40,7 @@ public class JdbcFoodServiceTests {
         cola.decreaseQuantity(1);
         jdbcFoodService.save(cola);
         
-        Food savedCola = jdbcFoodService.findById(cola.getId());
+        Food savedCola = jdbcFoodRepository.findById(cola.getId());
         assertThat(savedCola.getQuantity(), equalTo(1));
     }
     
@@ -45,7 +49,7 @@ public class JdbcFoodServiceTests {
         Food milk = new Food("파스퇴르 우유 1.8L", 1, "2018-09-28");
         jdbcFoodService.save(milk);
         Long id = milk.getId();
-        assertThat(jdbcFoodService.findById(id), notNullValue());
+        assertThat(jdbcFoodRepository.findById(id), notNullValue());
         
         boolean result = jdbcFoodService.remove(milk);
         assertThat(result, equalTo(true));

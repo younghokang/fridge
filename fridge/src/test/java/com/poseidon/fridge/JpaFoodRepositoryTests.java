@@ -37,4 +37,14 @@ public class JpaFoodRepositoryTests {
         assertThat(savedCola.getQuantity()).isEqualTo(1);
     }
     
+    @Test
+    public void remove() {
+        Food cola = new Food("코카콜라 500mL", 2, "2018-10-30");
+        jpaFoodRepository.save(cola);
+        assertThat(jpaFoodRepository.findAll().size()).isEqualTo(1);
+        
+        jpaFoodRepository.delete(cola.getId());
+        assertThat(jpaFoodRepository.findAll().size()).isEqualTo(0);
+    }
+    
 }

@@ -32,4 +32,11 @@ public class JdbcFoodService implements FoodService {
         jdbcFoodRepository.deleteAll();
     }
 
+    @Override
+    public void remove(Long id) {
+        Food food = new Food();
+        food.setId(id);
+        jdbcFoodRepository.remove(food);
+    }
+
 }

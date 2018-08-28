@@ -28,4 +28,9 @@ public class JpaFoodService implements FoodService {
         jpaFoodRepository.deleteAll();
     }
 
+    @Override
+    public void remove(Long id) {
+        jpaFoodRepository.delete(id);
+    }
+
 }

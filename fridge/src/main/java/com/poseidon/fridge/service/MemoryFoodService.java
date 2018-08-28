@@ -1,6 +1,7 @@
 package com.poseidon.fridge.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -48,6 +49,18 @@ public class MemoryFoodService implements FoodService {
     @Override
     public void removeAll() {
         foods.clear();
+    }
+
+    @Override
+    public void remove(Long id) {
+        Iterator<Food> itr = foods.iterator();
+        while(itr.hasNext()) {
+            Food food = itr.next();
+            if(food.getId() == id) {
+                itr.remove();
+                break;
+            }
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -104,6 +105,18 @@ public class MemoryFoodServiceTests {
         boolean success = memoryFoodService.remove(beer);
         assertThat(success, equalTo(true));
         assertThat(memoryFoodService.findAll().size(), equalTo(0));
+    }
+    
+    @Test
+    public void removeById() {
+        Long id = 1L;
+        foods = Arrays.asList(milk, cola);
+        for(Food food : foods) {
+            memoryFoodService.save(food);
+        }
+        memoryFoodService.remove(id);
+        foods = memoryFoodService.findAll();
+        assertThat(foods.size(), equalTo(1));
     }
 
 }

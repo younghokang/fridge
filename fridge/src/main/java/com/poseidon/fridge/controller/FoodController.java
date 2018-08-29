@@ -1,9 +1,14 @@
 package com.poseidon.fridge.controller;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import com.poseidon.fridge.model.Food;
+import com.poseidon.fridge.model.FoodResource;
+import com.poseidon.fridge.model.FoodResourceAssembler;
 import com.poseidon.fridge.repository.JpaFoodRepository;
 import com.poseidon.fridge.service.JpaFoodService;
 
@@ -29,18 +36,28 @@ public class FoodController {
     @Autowired
     private JpaFoodService jpaFoodService;
     
+    FoodResourceAssembler assembler = new FoodResourceAssembler();
+    
     @GetMapping
-    public List<Food> findAllFoods() {
-        return jpaFoodRepository.findAll();
+    public ResponseEntity<Resources<FoodResource>> findAllFoods() {
+        List<Food> foods = jpaFoodRepository.findAll();
+        if(foods.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        List<FoodResource> foodResources = assembler.toResources(foods);
+        Link link = linkTo(methodOn(FoodController.class).findAllFoods()).withSelfRel();
+        Resources<FoodResource> resources = new Resources<>(foodResources, link);
+        return ResponseEntity.ok(resources);
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Food> findById(@PathVariable final long id) {
+    public ResponseEntity<FoodResource> findById(@PathVariable final long id) {
         Food food = jpaFoodRepository.findOne(id);
         if(food == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(food);
+        return ResponseEntity.ok(assembler.toResource(food));
     }
     
     @PostMapping

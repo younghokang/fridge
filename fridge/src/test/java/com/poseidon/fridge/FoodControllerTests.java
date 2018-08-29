@@ -1,11 +1,13 @@
 package com.poseidon.fridge;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,6 +52,7 @@ public class FoodControllerTests {
     
     private Food milk;
     private static final Long ID = 1L;
+    private static final String BASE_PATH = "http://localhost";
     
     @Before
     public void setUp() {
@@ -61,21 +65,34 @@ public class FoodControllerTests {
         List<Food> foods = Arrays.asList(milk);
         given(jpaFoodRepository.findAll()).willReturn(foods);
         
-        String expectedJson = mapper.writeValueAsString(foods);
-        mvc.perform(get("/foods").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
+        final ResultActions result = mvc.perform(get("/foods").accept(MediaType.APPLICATION_JSON_UTF8));
+        result.andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(content().json(expectedJson));
+            .andExpect(jsonPath("_links.self.href", equalTo(BASE_PATH + "/foods")))
+            .andExpect(jsonPath("_embedded.foodResourceList[0].id", equalTo(milk.getId().intValue())))
+            .andExpect(jsonPath("_embedded.foodResourceList[0].name", equalTo(milk.getName())))
+            .andExpect(jsonPath("_embedded.foodResourceList[0].quantity", equalTo(milk.getQuantity())))
+            .andExpect(jsonPath("_embedded.foodResourceList[0].expiryDate", equalTo(milk.getExpiryDate())))
+            .andExpect(jsonPath("_embedded.foodResourceList[0]._links.self.href", equalTo(BASE_PATH + "/foods/" + milk.getId().intValue())));
     }
     
     @Test
     public void findById() throws Exception {
         given(jpaFoodRepository.findOne(ID)).willReturn(milk);
-        mvc.perform(get("/foods/" + ID))
-            .andExpect(status().isOk())
-            .andExpect(content().json(mapper.writeValueAsString(milk)));
+        final ResultActions result = mvc.perform(get("/foods/" + ID));
+        result.andExpect(status().isOk());
+        verifyResultContent(result);
     }
     
+    private void verifyResultContent(final ResultActions result) throws Exception {
+        result
+            .andExpect(jsonPath("id", equalTo(milk.getId().intValue())))
+            .andExpect(jsonPath("name", equalTo(milk.getName())))
+            .andExpect(jsonPath("quantity", equalTo(milk.getQuantity())))
+            .andExpect(jsonPath("expiryDate", equalTo(milk.getExpiryDate())))
+            .andExpect(jsonPath("_links.self.href", equalTo(BASE_PATH + "/foods/" + milk.getId())));
+    }
+
     @Test
     public void postSave() throws Exception {
         given(jpaFoodService.save(any(Food.class))).willReturn(milk);

@@ -6,12 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FoodResource extends ResourceSupport {
     @JsonProperty
-    long id;
+    public long id;
     @JsonProperty
-    String name;
+    public String name;
     @JsonProperty
-    int quantity;
+    public int quantity;
     @JsonProperty
-    String expiryDate;
+    public String expiryDate;
     
 }

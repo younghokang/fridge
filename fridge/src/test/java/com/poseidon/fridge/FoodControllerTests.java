@@ -96,12 +96,12 @@ public class FoodControllerTests {
     @Test
     public void postSave() throws Exception {
         given(jpaFoodService.save(any(Food.class))).willReturn(milk);
-        mvc.perform(post("/foods")
+        final ResultActions result = mvc.perform(post("/foods")
                 .content(mapper.writeValueAsString(milk))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(status().isCreated())
-            .andExpect(content().json(mapper.writeValueAsString(milk)))
+                .contentType(MediaType.APPLICATION_JSON_UTF8));
+        result.andExpect(status().isCreated())
             .andExpect(redirectedUrlPattern("**/foods/{id:\\d+}"));
+        verifyResultContent(result);
     }
     
     @Test

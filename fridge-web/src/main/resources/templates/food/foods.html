@@ -2,6 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Food</title>
+  <script th:inline="javascript" th:if="${!#strings.isEmpty(registerFoodMessage)}">
+  alert([[${registerFoodMessage}]]);
+  </script>
 </head>
 <body>
   <h2>Hello, world!</h2>

@@ -2,6 +2,10 @@ package com.poseidon.fridge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +22,16 @@ public class JpaFoodRepositoryTests {
     @Autowired
     JpaFoodRepository jpaFoodRepository;
     
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private Food cola;
+    
+    @Before
+    public void setUp() throws ParseException {
+        cola = new Food("코카콜라 500mL", 2, sdf.parse("2018-10-30"));
+    }
+    
     @Test
     public void save() {
-        Food cola = new Food("코카콜라 500mL", 2, "2018-10-30");
         jpaFoodRepository.save(cola);
         Food food = jpaFoodRepository.findOne(cola.getId());
         assertThat(food.getName()).isEqualTo(cola.getName());
@@ -28,7 +39,6 @@ public class JpaFoodRepositoryTests {
     
     @Test
     public void update() {
-        Food cola = new Food("코카콜라 500mL", 2, "2018-10-30");
         jpaFoodRepository.save(cola);
         
         cola.decreaseQuantity(1);
@@ -39,7 +49,6 @@ public class JpaFoodRepositoryTests {
     
     @Test
     public void remove() {
-        Food cola = new Food("코카콜라 500mL", 2, "2018-10-30");
         jpaFoodRepository.save(cola);
         assertThat(jpaFoodRepository.findAll().size()).isEqualTo(1);
         

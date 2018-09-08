@@ -1,10 +1,14 @@
 package com.poseidon.fridge.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.google.common.base.Objects;
 
@@ -16,11 +20,13 @@ public class Food implements Cloneable {
     private Long id;
     private String name;
     private int quantity;
-    private String expiryDate;
+    
+    @Temporal(TemporalType.DATE)
+    private Date expiryDate;
     
     public Food() {}
     
-    public Food(String name, int quantity, String expiryDate) {
+    public Food(String name, int quantity, Date expiryDate) {
         this.name = name;
         this.quantity = quantity;
         this.expiryDate = expiryDate;
@@ -42,7 +48,7 @@ public class Food implements Cloneable {
         return quantity;
     }
 
-    public String getExpiryDate() {
+    public Date getExpiryDate() {
         return expiryDate;
     }
 

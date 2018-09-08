@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,13 +52,14 @@ public class FoodControllerTests {
     @MockBean
     private JpaFoodService jpaFoodService;
     
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private Food milk;
     private static final Long ID = 1L;
     private static final String BASE_PATH = "http://localhost";
     
     @Before
-    public void setUp() {
-        milk = new Food("파스퇴르 우유 1.8L", 1, "2018-09-28");
+    public void setUp() throws ParseException {
+        milk = new Food("파스퇴르 우유 1.8L", 1, sdf.parse("2018-09-28"));
         milk.setId(ID);
     }
     
@@ -72,7 +75,7 @@ public class FoodControllerTests {
             .andExpect(jsonPath("_embedded.foodResourceList[0].id", equalTo(milk.getId().intValue())))
             .andExpect(jsonPath("_embedded.foodResourceList[0].name", equalTo(milk.getName())))
             .andExpect(jsonPath("_embedded.foodResourceList[0].quantity", equalTo(milk.getQuantity())))
-            .andExpect(jsonPath("_embedded.foodResourceList[0].expiryDate", equalTo(milk.getExpiryDate())))
+            .andExpect(jsonPath("_embedded.foodResourceList[0].expiryDate", equalTo(milk.getExpiryDate().getTime())))
             .andExpect(jsonPath("_embedded.foodResourceList[0]._links.self.href", equalTo(BASE_PATH + "/foods/" + milk.getId().intValue())));
     }
     
@@ -89,7 +92,7 @@ public class FoodControllerTests {
             .andExpect(jsonPath("id", equalTo(milk.getId().intValue())))
             .andExpect(jsonPath("name", equalTo(milk.getName())))
             .andExpect(jsonPath("quantity", equalTo(milk.getQuantity())))
-            .andExpect(jsonPath("expiryDate", equalTo(milk.getExpiryDate())))
+            .andExpect(jsonPath("expiryDate", equalTo(milk.getExpiryDate().getTime())))
             .andExpect(jsonPath("_links.self.href", equalTo(BASE_PATH + "/foods/" + milk.getId())));
     }
 

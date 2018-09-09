@@ -41,10 +41,6 @@ public class FoodController {
     @GetMapping
     public ResponseEntity<Resources<FoodResource>> findAllFoods() {
         List<Food> foods = jpaFoodRepository.findAll();
-        if(foods.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        
         List<FoodResource> foodResources = assembler.toResources(foods);
         Link link = linkTo(methodOn(FoodController.class).findAllFoods()).withSelfRel();
         Resources<FoodResource> resources = new Resources<>(foodResources, link);

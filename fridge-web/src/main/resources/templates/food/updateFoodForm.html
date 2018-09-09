@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Food</title>
+</head>
+<body>
+  <h2>식품 상세</h2>
+  <form th:action="@{/web/foods/{id}(id=${foodCommand.id})}" th:object="${foodCommand}" th:method="put">
+	<div th:if="${#fields.hasErrors('*')}">
+	    <ul>
+	        <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
+	    </ul>
+	</div>
+    <label for="name">이름: 
+	    <input type="text" th:field="*{name}" />
+    </label><br/>
+    <label for="quantity">수량: 
+        <input type="text" th:field="*{quantity}" />
+    </label><br/>
+    <label for="expiryDate">유통기한: 
+        <input type="date" th:field="*{expiryDate}" />
+    </label><br/>
+    <button type="submit">저장</button>
+    <a href="/web/foods/delete/1" th:href="@{/web/foods/delete/{id}(id=*{id})}">삭제</a>
+  </form>
+</body>
+</html>

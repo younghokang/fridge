@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,13 @@ public class FridgeControllerTests {
     @MockBean
     private FridgeService fridgeService;
     
-    private Fridge myFridge = new Fridge("myFridge");
+    private Fridge myFridge;
+    
+    @Before
+    public void setUp() {
+        myFridge = new Fridge("myFridge");
+        myFridge.setId(1);
+    }
     
     @Test
     public void create() throws Exception {

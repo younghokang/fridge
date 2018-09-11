@@ -22,6 +22,10 @@ public class Fridge {
         return id;
     }
     
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    
     public String getNickname() {
         return nickname;
     }

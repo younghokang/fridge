@@ -16,12 +16,12 @@ public class FoodTests {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private Food milk;
-    private Food cola;
+    private Food coke;
     
     @Before
     public void setUp() throws ParseException {
         milk = new Food("파스퇴르 우유 1.8L", 1, sdf.parse("2018-09-28"));
-        cola = new Food("코카콜라 500mL", 2, sdf.parse("2018-10-30"));
+        coke = new Food("코카콜라 500mL", 2, sdf.parse("2018-10-30"));
     }
 
     @Test
@@ -33,26 +33,26 @@ public class FoodTests {
         assertThat(quantity, equalTo(1));
         assertThat(sdf.format(expiryDate), equalTo("2018-09-28"));
 
-        assertThat(cola.getName(), equalTo("코카콜라 500mL"));
-        assertThat(cola.getQuantity(), equalTo(2));
-        assertThat(sdf.format(cola.getExpiryDate()), equalTo("2018-10-30"));
+        assertThat(coke.getName(), equalTo("코카콜라 500mL"));
+        assertThat(coke.getQuantity(), equalTo(2));
+        assertThat(sdf.format(coke.getExpiryDate()), equalTo("2018-10-30"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void decreaseQuantity() {
-        cola.decreaseQuantity(1);
-        assertThat(cola.getQuantity(), equalTo(1));
+        coke.decreaseQuantity(1);
+        assertThat(coke.getQuantity(), equalTo(1));
 
-        cola.decreaseQuantity(1);
-        assertThat(cola.getQuantity(), equalTo(0));
+        coke.decreaseQuantity(1);
+        assertThat(coke.getQuantity(), equalTo(0));
 
-        cola.decreaseQuantity(2);
+        coke.decreaseQuantity(2);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void decreaseQuantityByNegativeQuantity() {
-        cola.decreaseQuantity(-2);
-        assertThat(cola.getQuantity(), equalTo(0));
+        coke.decreaseQuantity(-2);
+        assertThat(coke.getQuantity(), equalTo(0));
     }
     
 }

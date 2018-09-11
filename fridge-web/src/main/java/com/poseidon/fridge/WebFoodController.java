@@ -32,7 +32,7 @@ public class WebFoodController {
     
     @GetMapping
     public String foods(Model model) {
-        ResponseEntity<Resources<FoodCommand>> response = restTemplate.exchange("http://localhost:8081/foods", 
+        ResponseEntity<Resources<FoodCommand>> response = restTemplate.exchange("/foods", 
                 HttpMethod.GET, 
                 null, 
                 new ParameterizedTypeReference<Resources<FoodCommand>>() {}, 
@@ -54,7 +54,7 @@ public class WebFoodController {
             return "food/registerFoodForm";
         }
         
-        ResponseEntity<FoodCommand> response = restTemplate.postForEntity("http://localhost:8081/foods", foodCommand, FoodCommand.class);
+        ResponseEntity<FoodCommand> response = restTemplate.postForEntity("/foods", foodCommand, FoodCommand.class);
         if(response.getStatusCode().is2xxSuccessful()) {
             ra.addFlashAttribute("registerFoodMessage", "식품을 저장했습니다.");
         }
@@ -63,7 +63,7 @@ public class WebFoodController {
     
     @GetMapping("/{id}")
     public String updateFoodForm(@PathVariable long id, Model model) {
-        ResponseEntity<FoodCommand> response = restTemplate.getForEntity("http://localhost:8081/foods/{id}", FoodCommand.class, id);
+        ResponseEntity<FoodCommand> response = restTemplate.getForEntity("/foods/{id}", FoodCommand.class, id);
         if(response.getStatusCode().is2xxSuccessful()) {
             model.addAttribute("foodCommand", response.getBody());
         }
@@ -76,14 +76,14 @@ public class WebFoodController {
             return "food/updateFoodForm";
         }
         
-        restTemplate.put("http://localhost:8081/foods/{id}", foodCommand, id);
+        restTemplate.put("/foods/{id}", foodCommand, id);
         ra.addFlashAttribute("registerFoodMessage", "식품을 저장했습니다.");
         return "redirect:/web/foods";
     }
     
     @GetMapping("/delete/{id}")
     public String deleteFood(@PathVariable long id, RedirectAttributes ra) {
-        restTemplate.delete("http://localhost:8081/foods/{id}", id);
+        restTemplate.delete("/foods/{id}", id);
         ra.addFlashAttribute("registerFoodMessage", "식품을 삭제했습니다.");
         return "redirect:/web/foods";
     }

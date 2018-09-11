@@ -11,7 +11,7 @@ public class Application {
     
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
+        return builder.rootUri("http://localhost:8081").build();
     }
 
     public static void main(String[] args) {

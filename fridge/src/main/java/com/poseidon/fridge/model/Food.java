@@ -1,6 +1,7 @@
 package com.poseidon.fridge.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,11 +11,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.google.common.base.Objects;
-
 @Entity
 @Table(name="food")
-public class Food implements Cloneable {
+public class Food {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
@@ -71,17 +70,7 @@ public class Food implements Cloneable {
         if (obj == null || getClass() != obj.getClass())
             return false;
         Food other = (Food) obj;
-        return java.util.Objects.equals(getId(), other.getId());
-    }
-
-    @Override
-    public Food clone() {
-        try {
-            return (Food)super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return Objects.equals(getId(), other.getId());
     }
 
 }

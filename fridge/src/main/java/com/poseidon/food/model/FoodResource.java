@@ -1,4 +1,4 @@
-package com.poseidon.fridge.model;
+package com.poseidon.food.model;
 
 import java.util.Date;
 

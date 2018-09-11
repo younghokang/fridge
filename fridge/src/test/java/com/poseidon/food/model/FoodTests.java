@@ -1,4 +1,4 @@
-package com.poseidon.fridge;
+package com.poseidon.food.model;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -10,7 +10,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.poseidon.fridge.model.Food;
+import com.poseidon.food.model.Food;
 
 public class FoodTests {
 

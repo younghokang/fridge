@@ -1,8 +1,8 @@
-package com.poseidon.fridge.service;
+package com.poseidon.food.service;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.poseidon.fridge.model.Food;
+import com.poseidon.food.model.Food;
 
 @Transactional
 public interface FoodService {

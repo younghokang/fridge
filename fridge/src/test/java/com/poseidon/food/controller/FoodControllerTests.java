@@ -1,4 +1,4 @@
-package com.poseidon.fridge;
+package com.poseidon.food.controller;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.BDDMockito.given;
@@ -31,10 +31,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poseidon.fridge.controller.FoodController;
-import com.poseidon.fridge.model.Food;
-import com.poseidon.fridge.repository.JpaFoodRepository;
-import com.poseidon.fridge.service.JpaFoodService;
+import com.poseidon.food.controller.FoodController;
+import com.poseidon.food.model.Food;
+import com.poseidon.food.repository.JpaFoodRepository;
+import com.poseidon.food.service.JpaFoodService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(FoodController.class)

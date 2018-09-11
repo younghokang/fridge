@@ -1,4 +1,4 @@
-package com.poseidon.fridge.controller;
+package com.poseidon.food.controller;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
-import com.poseidon.fridge.model.Food;
-import com.poseidon.fridge.model.FoodResource;
-import com.poseidon.fridge.model.FoodResourceAssembler;
-import com.poseidon.fridge.repository.JpaFoodRepository;
-import com.poseidon.fridge.service.JpaFoodService;
+import com.poseidon.food.model.Food;
+import com.poseidon.food.model.FoodResource;
+import com.poseidon.food.model.FoodResourceAssembler;
+import com.poseidon.food.repository.JpaFoodRepository;
+import com.poseidon.food.service.JpaFoodService;
 
 @RestController
 @RequestMapping("/foods")

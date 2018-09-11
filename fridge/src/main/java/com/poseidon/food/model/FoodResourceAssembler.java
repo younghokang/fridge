@@ -1,10 +1,10 @@
-package com.poseidon.fridge.model;
+package com.poseidon.food.model;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 
-import com.poseidon.fridge.controller.FoodController;
+import com.poseidon.food.controller.FoodController;
 
 public class FoodResourceAssembler extends ResourceAssemblerSupport<Food, FoodResource> {
 

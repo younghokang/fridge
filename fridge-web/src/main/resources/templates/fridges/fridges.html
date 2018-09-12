@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Fridge</title>
+  <script th:inline="javascript" th:if="${!#strings.isEmpty(registerMessage)}">
+  alert([[${registerMessage}]]);
+  </script>
+</head>
+<body>
+  <h2>Fridges</h2>
+  <a href="/fridges/add" th:href="@{/fridges/add}" id="btnCreateFridge">등록</a>
+</body>
+</html>

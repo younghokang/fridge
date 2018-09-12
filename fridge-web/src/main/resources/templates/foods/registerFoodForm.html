@@ -4,8 +4,8 @@
   <title>Food</title>
 </head>
 <body>
-  <h2>식품 상세</h2>
-  <form th:action="@{/web/foods/{id}(id=${foodCommand.id})}" th:object="${foodCommand}" th:method="put">
+  <h2>식품 등록</h2>
+  <form th:action="@{/foods/add}" th:object="${foodCommand}" th:method="post">
 	<div th:if="${#fields.hasErrors('*')}">
 	    <ul>
 	        <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
@@ -21,7 +21,6 @@
         <input type="date" th:field="*{expiryDate}" />
     </label><br/>
     <button type="submit">저장</button>
-    <a href="/web/foods/delete/1" th:href="@{/web/foods/delete/{id}(id=*{id})}">삭제</a>
   </form>
 </body>
 </html>

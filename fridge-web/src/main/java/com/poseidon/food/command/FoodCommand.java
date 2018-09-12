@@ -1,4 +1,4 @@
-package com.poseidon.fridge.command;
+package com.poseidon.food.command;
 
 import java.util.Date;
 

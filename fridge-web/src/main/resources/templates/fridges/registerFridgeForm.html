@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Fridge</title>
+</head>
+<body>
+  <h2>냉장고 등록</h2>
+  <form th:action="@{/fridges/add}" th:object="${fridgeCommand}" th:method="post">
+	<div th:if="${#fields.hasErrors('*')}">
+	    <ul>
+	        <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
+	    </ul>
+	</div>
+    <label for="nickname">이름: 
+	    <input type="text" th:field="*{nickname}" />
+    </label><br/>
+    <button type="submit">저장</button>
+  </form>
+</body>
+</html>

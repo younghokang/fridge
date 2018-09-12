@@ -1,4 +1,4 @@
-package com.poseidon.fridge;
+package com.poseidon.food.controller;
 
 import java.util.Collections;
 
@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.poseidon.fridge.command.FoodCommand;
+import com.poseidon.food.command.FoodCommand;
 
 @Controller
-@RequestMapping("/web/foods")
-public class WebFoodController {
+@RequestMapping("/foods")
+public class FoodController {
     
     @Autowired
     private RestTemplate restTemplate;
@@ -40,25 +40,25 @@ public class WebFoodController {
         if(response.getStatusCode().is2xxSuccessful()) {
             model.addAttribute("foodList", response.getBody().getContent());
         }
-        return "food/foods";
+        return "foods/foods";
     }
     
     @GetMapping("/add")
     public String registerFoodForm(@ModelAttribute("foodCommand") FoodCommand foodCommand) {
-        return "food/registerFoodForm";
+        return "foods/registerFoodForm";
     }
     
     @PostMapping("/add")
     public String processRegistrationFood(@Valid FoodCommand foodCommand, Errors errors, RedirectAttributes ra) {
         if(errors.hasErrors()) {
-            return "food/registerFoodForm";
+            return "foods/registerFoodForm";
         }
         
         ResponseEntity<FoodCommand> response = restTemplate.postForEntity("/foods", foodCommand, FoodCommand.class);
         if(response.getStatusCode().is2xxSuccessful()) {
             ra.addFlashAttribute("registerFoodMessage", "식품을 저장했습니다.");
         }
-        return "redirect:/web/foods";
+        return "redirect:/foods";
     }
     
     @GetMapping("/{id}")
@@ -67,25 +67,25 @@ public class WebFoodController {
         if(response.getStatusCode().is2xxSuccessful()) {
             model.addAttribute("foodCommand", response.getBody());
         }
-        return "food/updateFoodForm";
+        return "foods/updateFoodForm";
     }
     
     @PutMapping("/{id}")
     public String processUpdateFood(@PathVariable long id, @Valid FoodCommand foodCommand, Errors errors, RedirectAttributes ra) {
         if(errors.hasErrors()) {
-            return "food/updateFoodForm";
+            return "foods/updateFoodForm";
         }
         
         restTemplate.put("/foods/{id}", foodCommand, id);
         ra.addFlashAttribute("registerFoodMessage", "식품을 저장했습니다.");
-        return "redirect:/web/foods";
+        return "redirect:/foods";
     }
     
     @GetMapping("/delete/{id}")
     public String deleteFood(@PathVariable long id, RedirectAttributes ra) {
         restTemplate.delete("/foods/{id}", id);
         ra.addFlashAttribute("registerFoodMessage", "식품을 삭제했습니다.");
-        return "redirect:/web/foods";
+        return "redirect:/foods";
     }
 
 }

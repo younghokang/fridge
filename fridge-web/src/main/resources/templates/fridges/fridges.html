@@ -9,5 +9,19 @@
 <body>
   <h2>Fridges</h2>
   <a href="/fridges/add" th:href="@{/fridges/add}" id="btnCreateFridge">등록</a>
+  <table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Nickname</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="fridge : ${fridgeList}">
+    <td th:text="${fridge.id}">1</td>
+    <td><a href="/fridges/1" th:href="@{/fridges/{id}(id=${fridge.id})}" th:text="${fridge.nickname}">myFridge</a></td>
+  </tr>
+  </tbody>
+  </table>
 </body>
 </html>

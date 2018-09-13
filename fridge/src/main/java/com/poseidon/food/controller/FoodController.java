@@ -51,7 +51,7 @@ public class FoodController {
     public ResponseEntity<FoodResource> findById(@PathVariable final long id) {
         Food food = jpaFoodRepository.findOne(id);
         if(food == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(assembler.toResource(food));
     }
@@ -68,21 +68,24 @@ public class FoodController {
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFood(@PathVariable final long id, @RequestBody final Food food) {
-        if(jpaFoodRepository.findOne(id) == null) {
-            return ResponseEntity.notFound().build();
+        if(jpaFoodRepository.findOne(id) != null) {
+            jpaFoodService.save(food);
         }
-        jpaFoodService.save(food);
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFood(@PathVariable final long id) {
-        if(jpaFoodRepository.findOne(id) == null) {
-            return ResponseEntity.notFound().build();
+        if(jpaFoodRepository.findOne(id) != null) {
+            jpaFoodService.remove(id);
         }
-        jpaFoodService.remove(id);
         return ResponseEntity.noContent().build();
     }
     
+    @DeleteMapping
+    public ResponseEntity<?> deleteAllFood() {
+        jpaFoodService.removeAll();
+        return ResponseEntity.noContent().build();
+    }
 
 }

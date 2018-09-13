@@ -13,6 +13,11 @@ import com.poseidon.ControllerBase;
 
 public class FridgeControllerTests extends ControllerBase {
     
+    @Override
+    protected void setUp() {
+        
+    }
+    
     @Test
     public void create() {
         browser.get(BASE_URL + "/fridges");

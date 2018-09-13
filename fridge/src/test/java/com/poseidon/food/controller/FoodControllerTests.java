@@ -4,6 +4,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -127,6 +130,16 @@ public class FoodControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
+    }
+    
+    @Test
+    public void deleteAll() throws Exception {
+        doNothing().when(jpaFoodService).removeAll();
+        URI uri = UriComponentsBuilder.fromUriString("/foods").build().toUri();
+        mvc.perform(MockMvcRequestBuilders.delete(uri))
+            .andExpect(status().isNoContent())
+            .andExpect(content().string(""));
+        verify(jpaFoodService, times(1)).removeAll();
     }
     
 }

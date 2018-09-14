@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -68,6 +69,24 @@ public class FridgeController {
             model.addAttribute("fridgeCommand", response.getBody());
         }
         return "fridges/updateFridgeForm";
+    }
+    
+    @PutMapping("/{id}")
+    public String processUpdateFridge(@PathVariable int id, @Valid FridgeCommand fridgeCommand, Errors errors, RedirectAttributes ra) {
+        if(errors.hasErrors()) {
+            return "fridges/updateFridgeForm";
+        }
+        
+        restTemplate.put("/fridges/{id}", fridgeCommand, id);
+        ra.addFlashAttribute("registerMessage", fridgeCommand.getNickname() + "을 수정했습니다.");
+        return "redirect:/fridges";
+    }
+    
+    @GetMapping("/delete/{id}")
+    public String deleteFridge(@PathVariable int id, RedirectAttributes ra) {
+        restTemplate.delete("/fridges/{id}", id);
+        ra.addFlashAttribute("registerMessage", "삭제했습니다.");
+        return "redirect:/fridges";
     }
     
 }

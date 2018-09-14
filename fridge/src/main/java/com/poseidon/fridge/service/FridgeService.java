@@ -7,4 +7,10 @@ import com.poseidon.fridge.model.Fridge;
 @Transactional
 public interface FridgeService {
     Fridge create(String nickname);
+
+    Fridge save(Fridge fridge);
+
+    void remove(int id);
+
+    void removeAll();
 }

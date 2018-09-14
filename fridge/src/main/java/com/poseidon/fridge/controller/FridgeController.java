@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,6 +64,28 @@ public class FridgeController {
         Link link = linkTo(methodOn(FridgeController.class).findAllFridges()).withSelfRel();
         Resources<FridgeResource> resources = new Resources<>(fridgeResources, link);
         return ResponseEntity.ok(resources);
+    }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateFridge(@PathVariable final int id, @RequestBody final Fridge fridge) {
+        if(jpaFridgeRepository.findOne(id) != null) {
+            fridgeService.save(fridge);
+        }
+        return ResponseEntity.noContent().build();
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFridgeById(@PathVariable final int id) {
+        if(jpaFridgeRepository.findOne(id) != null) {
+            fridgeService.remove(id);
+        }
+        return ResponseEntity.noContent().build();
+    }
+    
+    @DeleteMapping
+    public ResponseEntity<?> deleteAllFridge() {
+        fridgeService.removeAll();
+        return ResponseEntity.noContent().build();
     }
 
 }

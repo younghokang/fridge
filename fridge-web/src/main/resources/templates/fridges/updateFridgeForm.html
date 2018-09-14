@@ -15,6 +15,7 @@
 	    <input type="text" th:field="*{nickname}" />
     </label><br/>
     <button type="submit">저장</button>
+    <a href="/fridges/delete/1" th:href="@{/fridges/delete/{id}(id=*{id})}">삭제</a>
   </form>
 </body>
 </html>

@@ -18,4 +18,19 @@ public class FridgeServiceImpl implements FridgeService {
         return jpaFridgeRepository.save(fridge);
     }
 
+    @Override
+    public Fridge save(Fridge fridge) {
+        return jpaFridgeRepository.save(fridge);
+    }
+
+    @Override
+    public void remove(int id) {
+        jpaFridgeRepository.delete(id);
+    }
+
+    @Override
+    public void removeAll() {
+        jpaFridgeRepository.deleteAll();
+    }
+
 }

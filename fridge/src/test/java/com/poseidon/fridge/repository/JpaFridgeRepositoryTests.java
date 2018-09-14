@@ -25,5 +25,28 @@ public class JpaFridgeRepositoryTests {
         assertThat(fridge.getNickname()).isEqualTo(nickname);
         assertThat(fridge.getNickname()).isNotEqualTo("another nickname");
     }
+    
+    @Test
+    public void update() {
+        Fridge fridge = jpaFridgeRepository.save(new Fridge("myFridge"));
+        assertThat(jpaFridgeRepository.findOne(fridge.getId())).isNotNull();
+        
+        Fridge changeNicknameFridge = new Fridge("otherFridge");
+        changeNicknameFridge.setId(fridge.getId());
+        jpaFridgeRepository.save(changeNicknameFridge);
+        
+        Fridge savedFridge = jpaFridgeRepository.findOne(fridge.getId());
+        assertThat(savedFridge.getNickname()).isEqualTo(changeNicknameFridge.getNickname());
+    }
+    
+    @Test
+    public void remove() {
+        Fridge fridge = jpaFridgeRepository.save(new Fridge("myFridge"));
+        assertThat(jpaFridgeRepository.findOne(fridge.getId())).isNotNull();
+        assertThat(jpaFridgeRepository.count()).isEqualTo(1L);
+        
+        jpaFridgeRepository.delete(fridge.getId());
+        assertThat(jpaFridgeRepository.count()).isZero();
+    }
 
 }

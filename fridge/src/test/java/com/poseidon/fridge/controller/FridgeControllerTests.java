@@ -2,7 +2,12 @@ package com.poseidon.fridge.controller;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +30,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseidon.fridge.model.Fridge;
@@ -92,6 +100,38 @@ public class FridgeControllerTests {
             .andExpect(jsonPath("_embedded.fridgeResourceList[0].id", equalTo(myFridge.getId().intValue())))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0].nickname", equalTo(myFridge.getNickname())))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0]._links.self.href", equalTo(BASE_PATH + "/fridges/" + myFridge.getId().intValue())));
+    }
+    
+    @Test
+    public void put() throws Exception {
+        given(fridgeRepository.findOne(anyInt())).willReturn(myFridge);
+        given(fridgeService.save(any(Fridge.class))).willReturn(myFridge);
+        URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
+        mvc.perform(MockMvcRequestBuilders.put(uri)
+                .content(mapper.writeValueAsString(myFridge))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(status().isNoContent())
+            .andExpect(content().string(""));
+    }
+    
+    @Test
+    public void delete() throws Exception {
+        given(fridgeRepository.findOne(anyInt())).willReturn(myFridge);
+        URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
+        mvc.perform(MockMvcRequestBuilders.delete(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(status().isNoContent())
+            .andExpect(content().string(""));
+    }
+    
+    @Test
+    public void deleteAll() throws Exception {
+        doNothing().when(fridgeService).removeAll();
+        URI uri = UriComponentsBuilder.fromUriString("/fridges").build().toUri();
+        mvc.perform(MockMvcRequestBuilders.delete(uri))
+            .andExpect(status().isNoContent())
+            .andExpect(content().string(""));
+        verify(fridgeService, times(1)).removeAll();
     }
     
 }

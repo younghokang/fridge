@@ -2,6 +2,7 @@ package com.poseidon.fridge.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Condition;
@@ -28,7 +29,7 @@ public class FridgeControllerTests extends ControllerBase {
     
     @Override
     protected void setUp() {
-        
+        restTemplate.delete(FRIDGE_API_URL + "/fridges", Collections.emptyMap());
     }
     
     @Test
@@ -92,6 +93,55 @@ public class FridgeControllerTests extends ControllerBase {
         FridgeCommand fridge = response.getBody();
         assertThat(fridge.getId()).isPositive();
         return fridge.getId();
+    }
+    
+    @Test
+    public void changeNickNameAndSubmit() {
+        FridgeCommand fridge = new FridgeCommand();
+        fridge.setNickname("myFridge");
+        fridge.setId(createFridge(fridge));
+        
+        browser.get(BASE_URL + "/fridges/" + fridge.getId());
+        
+        String changeNickname = "otherFridge";
+        WebElement nicknameElement = browser.findElement(By.name("nickname"));
+        assertThat(nicknameElement.getAttribute("value")).isEqualTo(fridge.getNickname());
+        
+        nicknameElement.clear();
+        nicknameElement.sendKeys(changeNickname);
+        browser.findElementByTagName("form").submit();
+        
+        WebDriverWait wait = new WebDriverWait(browser, 10);
+        wait.until(ExpectedConditions.alertIsPresent());
+        
+        Alert alert = browser.switchTo().alert();
+        assertThat(alert.getText()).isEqualTo(changeNickname + "을 수정했습니다.");
+        alert.accept();
+        
+        browser.get(BASE_URL + "/fridges/" + fridge.getId());
+        assertThat(browser.findElement(By.name("nickname")).getAttribute("value")).isEqualTo(changeNickname);
+    }
+    
+    @Test
+    public void clickDeleteFridgeButton() {
+        FridgeCommand fridge = new FridgeCommand();
+        fridge.setNickname("myFridge");
+        fridge.setId(createFridge(fridge));
+        
+        browser.get(BASE_URL + "/fridges/" + fridge.getId());
+        
+        WebElement deleteBtn = browser.findElement(By.linkText("삭제"));
+        assertThat(deleteBtn.getAttribute("href")).isEqualTo(BASE_URL + "/fridges/delete/" + fridge.getId());
+        deleteBtn.click();
+        
+        WebDriverWait wait = new WebDriverWait(browser, 10);
+        wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert = browser.switchTo().alert();
+        assertThat(alert.getText()).isEqualTo("삭제했습니다.");
+        alert.accept();
+        
+        ResponseEntity<FridgeCommand> response = restTemplate.getForEntity(FRIDGE_API_URL + "/fridges/" + fridge.getId(), FridgeCommand.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
 }

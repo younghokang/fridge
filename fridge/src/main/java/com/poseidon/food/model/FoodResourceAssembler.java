@@ -14,13 +14,14 @@ public class FoodResourceAssembler extends ResourceAssemblerSupport<Food, FoodRe
 
     @Override
     public FoodResource toResource(Food food) {
-        FoodResource foodResource = new FoodResource();
-        foodResource.id = food.getId();
-        foodResource.name = food.getName();
-        foodResource.quantity = food.getQuantity();
-        foodResource.expiryDate = food.getExpiryDate();
-        foodResource.add(linkTo(FoodController.class).slash(foodResource.id).withSelfRel());
-        return foodResource;
+        FoodResource resource = new FoodResource();
+        resource.id = food.getId();
+        resource.name = food.getName();
+        resource.quantity = food.getQuantity();
+        resource.expiryDate = food.getExpiryDate();
+        resource.fridge = food.getFridge();
+        resource.add(linkTo(FoodController.class).slash(resource.id).withSelfRel());
+        return resource;
     }
     
 }

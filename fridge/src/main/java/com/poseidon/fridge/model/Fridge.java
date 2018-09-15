@@ -1,23 +1,41 @@
 package com.poseidon.fridge.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
-@Entity
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.poseidon.food.model.Food;
+
+@Entity(name="fridge")
 public class Fridge {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
     private String nickname;
     
+    @JsonIgnore
+    @OneToMany(mappedBy = "fridge", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Food> foods = new ArrayList<>();
+    
     protected Fridge() {}
     
     public Fridge(String nickname) {
-        this.nickname = nickname;
+        this(nickname, Collections.emptyList());
     }
     
+    public Fridge(String nickname, List<Food> foods) {
+        this.nickname = nickname;
+        this.foods.addAll(foods);
+    }
+
     public Integer getId() {
         return id;
     }
@@ -28,6 +46,24 @@ public class Fridge {
     
     public String getNickname() {
         return nickname;
+    }
+
+    public List<Food> getFoods() {
+        return foods;
+    }
+
+    public boolean hasFood() {
+        return !foods.isEmpty();
+    }
+
+    public void addFood(Food food) {
+        this.foods.add(food);
+        food.setFridge(this);
+    }
+
+    public void removeFood(Food food) {
+        this.foods.remove(food);
+        food.setFridge(null);
     }
     
 }

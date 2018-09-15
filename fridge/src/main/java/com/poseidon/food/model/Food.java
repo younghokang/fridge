@@ -7,21 +7,28 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-@Entity
-@Table(name="food")
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.poseidon.fridge.model.Fridge;
+
+@Entity(name="food")
 public class Food {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
+    
+    @ManyToOne
+    @JsonIgnore
+    private Fridge fridge;
     private String name;
     private int quantity;
     
     @Temporal(TemporalType.DATE)
     private Date expiryDate;
+    
     
     public Food() {}
     
@@ -37,6 +44,14 @@ public class Food {
     
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Fridge getFridge() {
+        return fridge;
+    }
+
+    public void setFridge(Fridge fridge) {
+        this.fridge = fridge;
     }
 
     public String getName() {

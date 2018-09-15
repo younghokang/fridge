@@ -34,10 +34,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poseidon.food.controller.FoodController;
 import com.poseidon.food.model.Food;
 import com.poseidon.food.repository.JpaFoodRepository;
 import com.poseidon.food.service.JpaFoodService;
+import com.poseidon.fridge.model.Fridge;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(FoodController.class)
@@ -64,6 +64,7 @@ public class FoodControllerTests {
     public void setUp() throws ParseException {
         milk = new Food("파스퇴르 우유 1.8L", 1, sdf.parse("2018-09-28"));
         milk.setId(ID);
+        milk.setFridge(new Fridge("myFridge"));
     }
     
     @Test
@@ -79,6 +80,7 @@ public class FoodControllerTests {
             .andExpect(jsonPath("_embedded.foodResourceList[0].name", equalTo(milk.getName())))
             .andExpect(jsonPath("_embedded.foodResourceList[0].quantity", equalTo(milk.getQuantity())))
             .andExpect(jsonPath("_embedded.foodResourceList[0].expiryDate", equalTo(milk.getExpiryDate().getTime())))
+            .andExpect(jsonPath("_embedded.foodResourceList[0].fridge.nickname", equalTo(milk.getFridge().getNickname())))
             .andExpect(jsonPath("_embedded.foodResourceList[0]._links.self.href", equalTo(BASE_PATH + "/foods/" + milk.getId().intValue())));
     }
     
@@ -96,7 +98,8 @@ public class FoodControllerTests {
             .andExpect(jsonPath("name", equalTo(milk.getName())))
             .andExpect(jsonPath("quantity", equalTo(milk.getQuantity())))
             .andExpect(jsonPath("expiryDate", equalTo(milk.getExpiryDate().getTime())))
-            .andExpect(jsonPath("_links.self.href", equalTo(BASE_PATH + "/foods/" + milk.getId())));
+            .andExpect(jsonPath("_links.self.href", equalTo(BASE_PATH + "/foods/" + milk.getId())))
+            .andExpect(jsonPath("fridge.nickname", equalTo(milk.getFridge().getNickname())));
     }
 
     @Test

@@ -13,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.poseidon.food.model.Food;
-import com.poseidon.food.repository.JpaFoodRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -34,6 +35,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poseidon.food.model.Food;
 import com.poseidon.fridge.model.Fridge;
 import com.poseidon.fridge.repository.JpaFridgeRepository;
 import com.poseidon.fridge.service.FridgeService;
@@ -62,6 +64,7 @@ public class FridgeControllerTests {
     public void setUp() {
         myFridge = new Fridge("myFridge");
         myFridge.setId(ID);
+        myFridge.addFood(new Food("파스퇴르 우유 1.8L", 1, new Date()));
     }
     
     @Test
@@ -78,6 +81,9 @@ public class FridgeControllerTests {
 
     private void verifyResultActions(final ResultActions resultAction) throws Exception {
         resultAction.andExpect(jsonPath("nickname", equalTo(myFridge.getNickname())));
+        resultAction.andExpect(jsonPath("foods[0].name", equalTo(myFridge.getFoods().get(0).getName())));
+        resultAction.andExpect(jsonPath("foods[0].quantity", equalTo(myFridge.getFoods().get(0).getQuantity())));
+        resultAction.andExpect(jsonPath("foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().getTime())));
     }
     
     @Test
@@ -99,6 +105,9 @@ public class FridgeControllerTests {
             .andExpect(jsonPath("_links.self.href", equalTo(BASE_PATH + "/fridges")))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0].id", equalTo(myFridge.getId().intValue())))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0].nickname", equalTo(myFridge.getNickname())))
+            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].name", equalTo(myFridge.getFoods().get(0).getName())))
+            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].quantity", equalTo(myFridge.getFoods().get(0).getQuantity())))
+            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().getTime())))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0]._links.self.href", equalTo(BASE_PATH + "/fridges/" + myFridge.getId().intValue())));
     }
     

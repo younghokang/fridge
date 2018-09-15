@@ -17,6 +17,7 @@ public class FridgeResourceAssembler extends ResourceAssemblerSupport<Fridge, Fr
         FridgeResource resource = new FridgeResource();
         resource.id = fridge.getId();
         resource.nickname = fridge.getNickname();
+        resource.foods = fridge.getFoods();
         resource.add(linkTo(FridgeController.class).slash(resource.id).withSelfRel());
         return resource;
     }

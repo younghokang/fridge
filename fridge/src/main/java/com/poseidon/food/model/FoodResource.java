@@ -5,15 +5,17 @@ import java.util.Date;
 import org.springframework.hateoas.ResourceSupport;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.poseidon.fridge.model.Fridge;
 
 public class FoodResource extends ResourceSupport {
     @JsonProperty
-    public long id;
+    long id;
     @JsonProperty
-    public String name;
+    String name;
     @JsonProperty
-    public int quantity;
+    int quantity;
     @JsonProperty
-    public Date expiryDate;
-    
+    Date expiryDate;
+    @JsonProperty
+    Fridge fridge; 
 }

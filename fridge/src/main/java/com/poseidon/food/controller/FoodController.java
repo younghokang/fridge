@@ -58,12 +58,12 @@ public class FoodController {
     
     @PostMapping
     public ResponseEntity<FoodResource> postFood(@RequestBody final Food food) {
-        jpaFoodService.save(food);
+        Food newFood = jpaFoodService.save(food);
         URI location = MvcUriComponentsBuilder.fromController(getClass())
                 .path("/{id}")    
-                .buildAndExpand(food.getId())
+                .buildAndExpand(newFood.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(assembler.toResource(food));
+        return ResponseEntity.created(location).body(assembler.toResource(newFood));
     }
     
     @PutMapping("/{id}")

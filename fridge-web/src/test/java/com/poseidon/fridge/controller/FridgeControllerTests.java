@@ -12,24 +12,27 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import com.poseidon.ControllerBase;
 import com.poseidon.fridge.command.FridgeCommand;
 
 public class FridgeControllerTests extends ControllerBase {
-    
-    @Autowired
-    private RestTemplate restTemplate;
-    
-    private static final String FRIDGE_API_URL = "http://localhost:8081";
+    private FridgeCommand fridge;
     
     @Override
     protected void setUp() {
-        restTemplate.delete(FRIDGE_API_URL + "/fridges", Collections.emptyMap());
+        restTemplate.delete(CORE_API_URL + "/fridges", Collections.emptyMap());
+        fridge = createFridge("myFridge");
+    }
+    
+    private FridgeCommand createFridge(String nickname) {
+        ResponseEntity<FridgeCommand> response = restTemplate.postForEntity(CORE_API_URL + "/fridges", nickname, FridgeCommand.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        FridgeCommand fridge = response.getBody();
+        assertThat(fridge.getId()).isPositive();
+        return fridge;
     }
     
     @Test
@@ -60,10 +63,6 @@ public class FridgeControllerTests extends ControllerBase {
     
     @Test
     public void clickAnchorTagFromFridges() {
-        FridgeCommand fridge = new FridgeCommand();
-        fridge.setNickname("myFridge");
-        fridge.setId(createFridge(fridge));
-        
         browser.get(BASE_URL + "/fridges");
         
         String viewPageUrl = BASE_URL + "/fridges/" + fridge.getId();
@@ -86,21 +85,8 @@ public class FridgeControllerTests extends ControllerBase {
         assertThat(browser.getCurrentUrl()).isEqualTo(viewPageUrl);
     }
     
-    private Integer createFridge(FridgeCommand fridgeCommand) {
-        String nickname = fridgeCommand.getNickname();
-        ResponseEntity<FridgeCommand> response = restTemplate.postForEntity(FRIDGE_API_URL + "/fridges", nickname, FridgeCommand.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        FridgeCommand fridge = response.getBody();
-        assertThat(fridge.getId()).isPositive();
-        return fridge.getId();
-    }
-    
     @Test
     public void changeNickNameAndSubmit() {
-        FridgeCommand fridge = new FridgeCommand();
-        fridge.setNickname("myFridge");
-        fridge.setId(createFridge(fridge));
-        
         browser.get(BASE_URL + "/fridges/" + fridge.getId());
         
         String changeNickname = "otherFridge";
@@ -124,10 +110,6 @@ public class FridgeControllerTests extends ControllerBase {
     
     @Test
     public void clickDeleteFridgeButton() {
-        FridgeCommand fridge = new FridgeCommand();
-        fridge.setNickname("myFridge");
-        fridge.setId(createFridge(fridge));
-        
         browser.get(BASE_URL + "/fridges/" + fridge.getId());
         
         WebElement deleteBtn = browser.findElement(By.linkText("삭제"));
@@ -140,7 +122,7 @@ public class FridgeControllerTests extends ControllerBase {
         assertThat(alert.getText()).isEqualTo("삭제했습니다.");
         alert.accept();
         
-        ResponseEntity<FridgeCommand> response = restTemplate.getForEntity(FRIDGE_API_URL + "/fridges/" + fridge.getId(), FridgeCommand.class);
+        ResponseEntity<FridgeCommand> response = restTemplate.getForEntity(CORE_API_URL + "/fridges/" + fridge.getId(), FridgeCommand.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 

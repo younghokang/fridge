@@ -17,24 +17,18 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import com.poseidon.ControllerBase;
 import com.poseidon.food.command.FoodCommand;
 
 public class FoodControllerTests extends ControllerBase {
-    
-    @Autowired
-    private RestTemplate restTemplate;
-    
-    private static final String FOOD_API_URL = "http://localhost:8081";
+    private FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
     
     @Override
     protected void setUp() {
-        restTemplate.delete(FOOD_API_URL + "/foods", Collections.emptyMap());
+        restTemplate.delete(CORE_API_URL + "/foods", Collections.emptyMap());
     }
     
     @Test
@@ -48,7 +42,6 @@ public class FoodControllerTests extends ControllerBase {
     public void fillInFoodRegisterFormAndSubmit() {
         browser.get(BASE_URL + "/foods/add");
         
-        FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
         LocalDateTime expiryDate = LocalDateTime.ofInstant(food.getExpiryDate().toInstant(), ZoneId.systemDefault());
         
         WebElement nameElement = browser.findElement(By.name("name"));
@@ -71,7 +64,6 @@ public class FoodControllerTests extends ControllerBase {
     
     @Test
     public void clickAnchorTagFromFood() {
-        FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
         Long id = registrationFood(food);
         
         browser.get(BASE_URL + "/foods");
@@ -97,7 +89,7 @@ public class FoodControllerTests extends ControllerBase {
     }
     
     private Long registrationFood(FoodCommand foodCommand) {
-        ResponseEntity<FoodCommand> response = restTemplate.postForEntity(FOOD_API_URL + "/foods", foodCommand, FoodCommand.class);
+        ResponseEntity<FoodCommand> response = restTemplate.postForEntity(CORE_API_URL + "/foods", foodCommand, FoodCommand.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Long id = response.getBody().getId();
         assertThat(id).isPositive();
@@ -106,7 +98,6 @@ public class FoodControllerTests extends ControllerBase {
     
     @Test
     public void changeFoodNameAndSubmit() {
-        FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
         Long id = registrationFood(food);
         
         browser.get(BASE_URL + "/foods/" + id);
@@ -130,7 +121,6 @@ public class FoodControllerTests extends ControllerBase {
     
     @Test
     public void clickDeleteFoodButton() {
-        FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
         Long id = registrationFood(food);
         
         browser.get(BASE_URL + "/foods/" + id);
@@ -145,7 +135,7 @@ public class FoodControllerTests extends ControllerBase {
         assertThat(alert.getText()).isEqualTo("식품을 삭제했습니다.");
         alert.accept();
         
-        ResponseEntity<FoodCommand> response = restTemplate.getForEntity(FOOD_API_URL + "/foods/" + id, FoodCommand.class);
+        ResponseEntity<FoodCommand> response = restTemplate.getForEntity(CORE_API_URL + "/foods/" + id, FoodCommand.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
     

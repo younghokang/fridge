@@ -7,10 +7,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
@@ -22,6 +24,11 @@ public abstract class ControllerBase {
     private int port;
     private String host = "http://localhost";
     protected static String BASE_URL;
+    
+    @Autowired
+    protected RestTemplate restTemplate;
+    
+    protected static final String CORE_API_URL = "http://localhost:8081";
     
     @Before
     public void init() {

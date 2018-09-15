@@ -13,7 +13,7 @@ public class Application {
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.rootUri("http://localhost:8081").build();
     }
-
+    
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

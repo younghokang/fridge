@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html layout:decorator="layout/default" xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Fridge</title>
   <script th:inline="javascript" th:if="${!#strings.isEmpty(registerFoodMessage)}">
@@ -7,23 +7,25 @@
   </script>
 </head>
 <body>
-  <h2>Foods</h2>
-  <a href="/foods/add" th:href="@{/foods/add}" th:text="식품등록" id="btnRegistrationFood">등록</a>
-  <table>
-  <thead>
-  <tr>
-    <th>식품명</th>
-    <th>수량</th>
-    <th>유통기한</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="food : ${foodList}">
-    <td><a href="/foods/1" th:href="@{/foods/{id}(id=${food.id})}" th:text="${food.name}">파스퇴르 우유 1.8L</a></td>
-    <td th:text="${food.quantity}">1</td>
-    <td th:text="${#dates.format(food.expiryDate, 'yyyy-MM-dd')}">2018-09-28</td>
-  </tr>
-  </tbody>
-  </table>
+    <div layout:fragment="content" class="container">
+	  <h2>Foods</h2>
+	  <a href="/foods/add" th:href="@{/foods/add}" th:text="식품등록" id="btnRegistrationFood">등록</a>
+	  <table>
+	  <thead>
+	  <tr>
+	    <th>식품명</th>
+	    <th>수량</th>
+	    <th>유통기한</th>
+	  </tr>
+	  </thead>
+	  <tbody>
+	  <tr th:each="food : ${foodList}">
+	    <td><a href="/foods/1" th:href="@{/foods/{id}(id=${food.id})}" th:text="${food.name}">파스퇴르 우유 1.8L</a></td>
+	    <td th:text="${food.quantity}">1</td>
+	    <td th:text="${#dates.format(food.expiryDate, 'yyyy-MM-dd')}">2018-09-28</td>
+	  </tr>
+	  </tbody>
+	  </table>
+    </div>
 </body>
 </html>

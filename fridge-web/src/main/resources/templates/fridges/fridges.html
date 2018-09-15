@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html layout:decorator="layout/default" xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Fridge</title>
   <script th:inline="javascript" th:if="${!#strings.isEmpty(registerMessage)}">
@@ -7,21 +7,24 @@
   </script>
 </head>
 <body>
-  <h2>Fridges</h2>
-  <a href="/fridges/add" th:href="@{/fridges/add}" id="btnCreateFridge">등록</a>
-  <table>
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Nickname</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="fridge : ${fridgeList}">
-    <td th:text="${fridge.id}">1</td>
-    <td><a href="/fridges/1" th:href="@{/fridges/{id}(id=${fridge.id})}" th:text="${fridge.nickname}">myFridge</a></td>
-  </tr>
-  </tbody>
-  </table>
+    <div layout:fragment="content" class="container">
+	    <div class="card text-center">
+	        <div class="card-header">
+	            <ul class="nav nav-tabs card-header-tabs">
+	                <li class="nav-item" th:each="fridge,iterStat : ${fridgeList}">
+		                <a th:class="${iterStat.first}? 'nav-link active' : 'nav-link'" href="/fridges/1" th:href="@{/fridges/{id}(id=${fridge.id})}" th:text="${fridge.nickname}">myFridge</a>                
+		            </li>
+		            <li class="nav-item">
+		              <a class="nav-link text-secondary" role="button" href="/fridges/add" th:href="@{/fridges/add}" id="btnCreateFridge">+</a>
+		            </li>
+	            </ul>
+	        </div>
+	        <div class="card-body">
+	            <h5 class="card-title">냉장고를 채워주세요.</h5>
+	            <p class="card-text">식품 추가하기 버튼을 눌러서 보관하실 식품을 추가해보세요!</p>
+	            <a class="btn btn-primary btn-lg" role="button" href="/foods/add" th:href="@{/foods/add}" id="btnRegistrationFood">식품 추가하기</a>
+	        </div>
+	    </div>
+    </div>
 </body>
 </html>

@@ -3,6 +3,7 @@ package com.poseidon.fridge.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -66,4 +67,24 @@ public class Fridge {
         food.setFridge(null);
     }
     
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Fridge other = (Fridge) obj;
+        return Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public String toString() {
+        return "Fridge [id=" + id + ", nickname=" + nickname + "]";
+    }
+
 }

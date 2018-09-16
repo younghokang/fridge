@@ -9,6 +9,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.poseidon.fridge.command.FridgeCommand;
+
 public class FoodCommand {
     
     private Long id;
@@ -23,6 +25,7 @@ public class FoodCommand {
     
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private Date expiryDate;
+    private FridgeCommand fridge;
     
     public FoodCommand() {}
     
@@ -55,6 +58,12 @@ public class FoodCommand {
     }
     public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
+    }
+    public FridgeCommand getFridge() {
+        return fridge;
+    }
+    public void setFridge(FridgeCommand fridge) {
+        this.fridge = fridge;
     }
 
     @Override

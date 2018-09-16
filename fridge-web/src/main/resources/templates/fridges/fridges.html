@@ -19,11 +19,29 @@
 		            </li>
 	            </ul>
 	        </div>
-	        <div class="card-body">
-	            <h5 class="card-title">냉장고를 채워주세요.</h5>
-	            <p class="card-text">식품 추가하기 버튼을 눌러서 보관하실 식품을 추가해보세요!</p>
-	            <a class="btn btn-primary btn-lg" role="button" href="/foods/add" th:href="@{/foods/add}" id="btnRegistrationFood">식품 추가하기</a>
+	        <div th:each="fridge,iterStat : ${fridgeList}" th:if="${iterStat.first and not #lists.isEmpty(fridge.foods)}">
+                <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">식품명</th>
+                    <th scope="col">수량</th>
+                    <th scope="col">유통기한</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="food : ${fridge.foods}">
+                    <td th:text="${food.name}">name</td>
+                    <td th:text="${food.quantity}">1</td>
+                    <td th:text="${#dates.format(food.expiryDate, 'yyyy-MM-dd')}">2018-09-09</td>
+                </tr>
+                </tbody>
+                </table>
 	        </div>
+	        <div class="card-body" th:each="fridge,iterStat : ${fridgeList}" th:if="${iterStat.first and #lists.isEmpty(fridge.foods)}">
+                <h5 class="card-title">냉장고를 채워주세요.</h5>
+                <p class="card-text">식품 추가하기 버튼을 눌러서 보관하실 식품을 추가해보세요!</p>
+                <a class="btn btn-primary btn-lg" role="button" href="/foods/add" th:href="@{/foods/add(fridge.id=${fridge.id})}" id="btnRegistrationFood">식품 추가하기</a>
+            </div>
 	    </div>
     </div>
 </body>

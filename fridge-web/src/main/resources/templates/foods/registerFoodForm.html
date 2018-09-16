@@ -7,6 +7,7 @@
     <div layout:fragment="content" class="container">
 	  <h2>식품 등록</h2>
 	  <form th:action="@{/foods/add}" th:object="${foodCommand}" th:method="post">
+	      <input type="hidden" th:field="*{fridge.id}" />
 		<div th:if="${#fields.hasErrors('*')}">
 		    <ul>
 		        <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>

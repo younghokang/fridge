@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import com.poseidon.food.model.Food;
+import com.poseidon.food.model.FoodRequest;
 import com.poseidon.food.model.FoodResource;
 import com.poseidon.food.model.FoodResourceAssembler;
 import com.poseidon.food.repository.JpaFoodRepository;
@@ -57,8 +58,8 @@ public class FoodController {
     }
     
     @PostMapping
-    public ResponseEntity<FoodResource> postFood(@RequestBody final Food food) {
-        Food newFood = jpaFoodService.save(food);
+    public ResponseEntity<FoodResource> postFood(@RequestBody final FoodRequest foodRequest) {
+        Food newFood = jpaFoodService.save(foodRequest.toFood());
         URI location = MvcUriComponentsBuilder.fromController(getClass())
                 .path("/{id}")    
                 .buildAndExpand(newFood.getId())
@@ -67,9 +68,9 @@ public class FoodController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateFood(@PathVariable final long id, @RequestBody final Food food) {
+    public ResponseEntity<?> updateFood(@PathVariable final long id, @RequestBody final FoodRequest foodRequest) {
         if(jpaFoodRepository.findOne(id) != null) {
-            jpaFoodService.save(food);
+            jpaFoodService.save(foodRequest.toFood());
         }
         return ResponseEntity.noContent().build();
     }

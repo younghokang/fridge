@@ -1,13 +1,18 @@
 package com.poseidon.fridge.command;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.poseidon.food.command.FoodCommand;
 
 public class FridgeCommand {
     private Integer id;
     @NotNull
     @Size(min=2, max=15)
     private String nickname;
+    private List<FoodCommand> foods;
     public Integer getId() {
         return id;
     }
@@ -19,6 +24,12 @@ public class FridgeCommand {
     }
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+    public List<FoodCommand> getFoods() {
+        return foods;
+    }
+    public void setFoods(List<FoodCommand> foods) {
+        this.foods = foods;
     }
 
 }

@@ -9,13 +9,13 @@ import com.poseidon.fridge.model.Fridge;
 
 public class FoodResource extends ResourceSupport {
     @JsonProperty
-    long id;
+    Long id;
     @JsonProperty
     String name;
     @JsonProperty
-    int quantity;
+    Integer quantity;
     @JsonProperty
     Date expiryDate;
     @JsonProperty
-    Fridge fridge; 
+    Fridge fridge;
 }

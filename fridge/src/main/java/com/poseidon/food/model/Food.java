@@ -29,7 +29,6 @@ public class Food {
     @Temporal(TemporalType.DATE)
     private Date expiryDate;
     
-    
     public Food() {}
     
     public Food(String name, int quantity, Date expiryDate) {
@@ -65,14 +64,14 @@ public class Food {
     public Date getExpiryDate() {
         return expiryDate;
     }
-
+    
     public void decreaseQuantity(int quantity) {
         if (quantity < 0 || this.quantity - quantity < 0) {
             throw new IllegalArgumentException("current(" + this.quantity + "), quantity(" + quantity + ")");
         }
         this.quantity -= quantity;
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hashCode(getId());

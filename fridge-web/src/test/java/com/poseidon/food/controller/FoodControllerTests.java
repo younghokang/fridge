@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -22,13 +21,19 @@ import org.springframework.http.ResponseEntity;
 
 import com.poseidon.ControllerBase;
 import com.poseidon.food.command.FoodCommand;
+import com.poseidon.fridge.command.FridgeCommand;
 
 public class FoodControllerTests extends ControllerBase {
-    private FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
+    private FoodCommand food;
+    private FridgeCommand fridge;
     
     @Override
     protected void setUp() {
-        restTemplate.delete(CORE_API_URL + "/foods", Collections.emptyMap());
+        fridge = createFridge("myFridge");
+        
+        FoodCommand foodCommand = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
+        foodCommand.setFridge(fridge);
+        food = createFood(foodCommand);
     }
     
     @Test
@@ -40,7 +45,7 @@ public class FoodControllerTests extends ControllerBase {
     
     @Test
     public void fillInFoodRegisterFormAndSubmit() {
-        browser.get(BASE_URL + "/foods/add");
+        browser.get(BASE_URL + "/foods/add?fridge.id=" + fridge.getId());
         
         LocalDateTime expiryDate = LocalDateTime.ofInstant(food.getExpiryDate().toInstant(), ZoneId.systemDefault());
         
@@ -64,7 +69,7 @@ public class FoodControllerTests extends ControllerBase {
     
     @Test
     public void clickAnchorTagFromFood() {
-        Long id = registrationFood(food);
+        Long id = food.getId();
         
         browser.get(BASE_URL + "/foods");
         
@@ -88,17 +93,9 @@ public class FoodControllerTests extends ControllerBase {
         assertThat(browser.getCurrentUrl()).isEqualTo(viewPageUrl);
     }
     
-    private Long registrationFood(FoodCommand foodCommand) {
-        ResponseEntity<FoodCommand> response = restTemplate.postForEntity(CORE_API_URL + "/foods", foodCommand, FoodCommand.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        Long id = response.getBody().getId();
-        assertThat(id).isPositive();
-        return id;
-    }
-    
     @Test
     public void changeFoodNameAndSubmit() {
-        Long id = registrationFood(food);
+        Long id = food.getId();
         
         browser.get(BASE_URL + "/foods/" + id);
         
@@ -121,7 +118,7 @@ public class FoodControllerTests extends ControllerBase {
     
     @Test
     public void clickDeleteFoodButton() {
-        Long id = registrationFood(food);
+        Long id = food.getId();
         
         browser.get(BASE_URL + "/foods/" + id);
         

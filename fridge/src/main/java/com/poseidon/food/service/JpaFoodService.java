@@ -11,7 +11,7 @@ public class JpaFoodService implements FoodService {
     
     @Autowired
     private JpaFoodRepository jpaFoodRepository;
-
+    
     @Override
     public Food save(Food food) {
         return jpaFoodRepository.save(food);

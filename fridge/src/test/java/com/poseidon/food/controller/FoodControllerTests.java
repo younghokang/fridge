@@ -36,7 +36,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseidon.food.model.Food;
 import com.poseidon.food.repository.JpaFoodRepository;
-import com.poseidon.food.service.JpaFoodService;
+import com.poseidon.food.service.FoodService;
 import com.poseidon.fridge.model.Fridge;
 
 @RunWith(SpringRunner.class)
@@ -53,7 +53,7 @@ public class FoodControllerTests {
     private JpaFoodRepository jpaFoodRepository;
     
     @MockBean
-    private JpaFoodService jpaFoodService;
+    private FoodService foodService;
     
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private Food milk;
@@ -104,7 +104,7 @@ public class FoodControllerTests {
 
     @Test
     public void postSave() throws Exception {
-        given(jpaFoodService.save(any(Food.class))).willReturn(milk);
+        given(foodService.save(any(Food.class))).willReturn(milk);
         final ResultActions result = mvc.perform(post("/foods")
                 .content(mapper.writeValueAsString(milk))
                 .contentType(MediaType.APPLICATION_JSON_UTF8));
@@ -116,7 +116,7 @@ public class FoodControllerTests {
     @Test
     public void put() throws Exception {
         given(jpaFoodRepository.findOne(anyLong())).willReturn(milk);
-        given(jpaFoodService.save(any(Food.class))).willReturn(milk);
+        given(foodService.save(any(Food.class))).willReturn(milk);
         URI uri = UriComponentsBuilder.fromUriString("/foods/{id}").buildAndExpand(ID).toUri();
         mvc.perform(MockMvcRequestBuilders.put(uri)
                 .content(mapper.writeValueAsString(milk))
@@ -137,12 +137,12 @@ public class FoodControllerTests {
     
     @Test
     public void deleteAll() throws Exception {
-        doNothing().when(jpaFoodService).removeAll();
+        doNothing().when(foodService).removeAll();
         URI uri = UriComponentsBuilder.fromUriString("/foods").build().toUri();
         mvc.perform(MockMvcRequestBuilders.delete(uri))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
-        verify(jpaFoodService, times(1)).removeAll();
+        verify(foodService, times(1)).removeAll();
     }
     
 }

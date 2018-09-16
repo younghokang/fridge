@@ -25,7 +25,7 @@ import com.poseidon.food.model.FoodRequest;
 import com.poseidon.food.model.FoodResource;
 import com.poseidon.food.model.FoodResourceAssembler;
 import com.poseidon.food.repository.JpaFoodRepository;
-import com.poseidon.food.service.JpaFoodService;
+import com.poseidon.food.service.FoodService;
 
 @RestController
 @RequestMapping("/foods")
@@ -35,7 +35,7 @@ public class FoodController {
     private JpaFoodRepository jpaFoodRepository;
     
     @Autowired
-    private JpaFoodService jpaFoodService;
+    private FoodService foodService;
     
     FoodResourceAssembler assembler = new FoodResourceAssembler();
     
@@ -59,7 +59,7 @@ public class FoodController {
     
     @PostMapping
     public ResponseEntity<FoodResource> postFood(@RequestBody final FoodRequest foodRequest) {
-        Food newFood = jpaFoodService.save(foodRequest.toFood());
+        Food newFood = foodService.save(foodRequest.toFood());
         URI location = MvcUriComponentsBuilder.fromController(getClass())
                 .path("/{id}")    
                 .buildAndExpand(newFood.getId())
@@ -70,7 +70,7 @@ public class FoodController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateFood(@PathVariable final long id, @RequestBody final FoodRequest foodRequest) {
         if(jpaFoodRepository.findOne(id) != null) {
-            jpaFoodService.save(foodRequest.toFood());
+            foodService.save(foodRequest.toFood());
         }
         return ResponseEntity.noContent().build();
     }
@@ -78,14 +78,14 @@ public class FoodController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFood(@PathVariable final long id) {
         if(jpaFoodRepository.findOne(id) != null) {
-            jpaFoodService.remove(id);
+            foodService.remove(id);
         }
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping
     public ResponseEntity<?> deleteAllFood() {
-        jpaFoodService.removeAll();
+        foodService.removeAll();
         return ResponseEntity.noContent().build();
     }
 

@@ -7,7 +7,7 @@ import com.poseidon.food.model.Food;
 import com.poseidon.food.repository.JpaFoodRepository;
 
 @Service
-public class JpaFoodService implements FoodService {
+public class FoodServiceImpl implements FoodService {
     
     @Autowired
     private JpaFoodRepository jpaFoodRepository;

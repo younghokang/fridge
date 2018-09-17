@@ -1,6 +1,7 @@
 package com.poseidon.fridge.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,14 +21,18 @@ public class FridgeServiceTests {
     FridgeService fridgeService;
     
     @Test
-    public void create() {
+    public void createWithUserId() {
         String nickname = "myFridge";
-        when(fridgeService.create(anyString())).thenReturn(new Fridge(nickname));
-        Fridge fridge = fridgeService.create(nickname);
+        long userId = 1004L;
+        Fridge newFridge = new Fridge(nickname);
+        newFridge.setUserId(userId);
+        when(fridgeService.create(anyString(), anyLong())).thenReturn(newFridge);
         
-        verify(fridgeService, times(1)).create(nickname);
+        Fridge fridge = fridgeService.create(nickname, userId);
         
-        assertThat(fridge.getNickname()).isEqualTo(nickname);
+        verify(fridgeService, times(1)).create(nickname, userId);
+        
+        assertThat(fridge).isSameAs(newFridge);
     }
 
 }

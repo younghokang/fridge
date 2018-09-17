@@ -39,5 +39,19 @@ public class FridgeTests {
         assertThat(fridge.getFoods().size()).isEqualTo(1);
         assertThat(fridge.getFoods()).containsOnlyElementsOf(foods);
     }
+    
+    @Test
+    public void fridgeByUserId() {
+        long firstUserId = 1004L;
+        Fridge firstFridge = new Fridge("firstFridge");
+        firstFridge.setUserId(firstUserId);
+        assertThat(firstFridge.getUserId()).isEqualTo(firstUserId);
+        
+        long secondUserId = 1008L;
+        Fridge secondFridge = new Fridge("secondFridge");
+        secondFridge.setUserId(secondUserId);
+        assertThat(secondFridge.getUserId()).isNotEqualTo(firstUserId);
+        assertThat(secondFridge.getUserId()).isEqualTo(secondUserId);
+    }
 
 }

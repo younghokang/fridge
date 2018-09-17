@@ -13,8 +13,9 @@ public class FridgeServiceImpl implements FridgeService {
     JpaFridgeRepository jpaFridgeRepository;
     
     @Override
-    public Fridge create(String nickname) {
+    public Fridge create(String nickname, long userId) {
         Fridge fridge = new Fridge(nickname);
+        fridge.setUserId(userId);
         return jpaFridgeRepository.save(fridge);
     }
 

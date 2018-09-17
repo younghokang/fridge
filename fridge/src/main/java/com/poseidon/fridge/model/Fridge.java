@@ -26,6 +26,8 @@ public class Fridge {
     @OneToMany(mappedBy = "fridge", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Food> foods = new ArrayList<>();
     
+    private Long userId;
+    
     protected Fridge() {}
     
     public Fridge(String nickname) {
@@ -67,6 +69,14 @@ public class Fridge {
         food.setFridge(null);
     }
     
+    public Long getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+    
     @Override
     public int hashCode() {
         return Objects.hashCode(getId());
@@ -84,7 +94,7 @@ public class Fridge {
 
     @Override
     public String toString() {
-        return "Fridge [id=" + id + ", nickname=" + nickname + "]";
+        return "Fridge [id=" + id + ", nickname=" + nickname + ", userId=" + userId + "]";
     }
 
 }

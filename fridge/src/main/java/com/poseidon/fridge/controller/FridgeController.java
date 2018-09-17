@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import com.poseidon.fridge.model.Fridge;
+import com.poseidon.fridge.model.FridgeRequest;
 import com.poseidon.fridge.model.FridgeResource;
 import com.poseidon.fridge.model.FridgeResourceAssembler;
 import com.poseidon.fridge.repository.JpaFridgeRepository;
@@ -39,8 +40,8 @@ public class FridgeController {
     FridgeResourceAssembler assembler = new FridgeResourceAssembler();
     
     @PostMapping
-    public ResponseEntity<FridgeResource> create(@RequestBody final String nickname) {
-        Fridge fridge = fridgeService.create(nickname);
+    public ResponseEntity<FridgeResource> create(@RequestBody final FridgeRequest fridgeRequest) {
+        Fridge fridge = fridgeService.create(fridgeRequest.getNickname(), fridgeRequest.getUserId());
         URI location = MvcUriComponentsBuilder.fromController(getClass())
                 .path("/{id}")    
                 .buildAndExpand(fridge.getId())
@@ -67,9 +68,9 @@ public class FridgeController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateFridge(@PathVariable final int id, @RequestBody final Fridge fridge) {
+    public ResponseEntity<?> updateFridge(@PathVariable final int id, @RequestBody final FridgeRequest fridgeRequest) {
         if(jpaFridgeRepository.findOne(id) != null) {
-            fridgeService.save(fridge);
+            fridgeService.save(fridgeRequest.toFridge());
         }
         return ResponseEntity.noContent().build();
     }
@@ -86,6 +87,15 @@ public class FridgeController {
     public ResponseEntity<?> deleteAllFridge() {
         fridgeService.removeAll();
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/me/{userId}")
+    public ResponseEntity<FridgeResource> loadMyFridge(@PathVariable final long userId) {
+        Fridge fridge = jpaFridgeRepository.findByUserId(userId);
+        if(fridge == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(assembler.toResource(fridge));
     }
 
 }

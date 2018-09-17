@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.poseidon.food.model.Food;
@@ -72,6 +73,33 @@ public class JpaFridgeRepositoryTests {
         
         assertThat(dbFridge.hasFood()).isFalse();
         assertThat(dbFridge.getFoods().size()).isZero();
+    }
+    
+    @Test
+    public void findByUserId() {
+        long firstUserId = 1004L;
+        Fridge firstFridge = new Fridge("firstFridge");
+        firstFridge.setUserId(firstUserId);
+        jpaFridgeRepository.save(firstFridge);
+        
+        Fridge dbFirstFridge = jpaFridgeRepository.findByUserId(firstUserId);
+        assertThat(dbFirstFridge).isSameAs(firstFridge);
+        
+        Fridge notExistFridge = jpaFridgeRepository.findByUserId(Long.MAX_VALUE);
+        assertThat(notExistFridge).isNull();
+    }
+    
+    @Test(expected=IncorrectResultSizeDataAccessException.class)
+    public void tooManyResult() {
+        long userId = 1004L;
+        Fridge fridge1 = new Fridge("fridge1");
+        Fridge fridge2 = new Fridge("fridge2");
+        fridge1.setUserId(userId);
+        fridge2.setUserId(userId);
+        jpaFridgeRepository.save(fridge1);
+        jpaFridgeRepository.save(fridge2);
+        
+        jpaFridgeRepository.findByUserId(userId);
     }
 
 }

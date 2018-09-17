@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -37,6 +38,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseidon.food.model.Food;
 import com.poseidon.fridge.model.Fridge;
+import com.poseidon.fridge.model.FridgeRequest;
 import com.poseidon.fridge.repository.JpaFridgeRepository;
 import com.poseidon.fridge.service.FridgeService;
 
@@ -58,18 +60,20 @@ public class FridgeControllerTests {
     
     private Fridge myFridge;
     private static final Integer ID = 1;
+    private static final Long USER_ID = 1004L;
     private static final String BASE_PATH = "http://localhost";
     
     @Before
     public void setUp() {
         myFridge = new Fridge("myFridge");
         myFridge.setId(ID);
+        myFridge.setUserId(USER_ID);
         myFridge.addFood(new Food("파스퇴르 우유 1.8L", 1, new Date()));
     }
     
     @Test
     public void create() throws Exception {
-        when(fridgeService.create(anyString())).thenReturn(myFridge);
+        when(fridgeService.create(anyString(), anyLong())).thenReturn(myFridge);
         
         final ResultActions resultAction = mvc.perform(post("/fridges")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -115,9 +119,16 @@ public class FridgeControllerTests {
     public void put() throws Exception {
         given(fridgeRepository.findOne(anyInt())).willReturn(myFridge);
         given(fridgeService.save(any(Fridge.class))).willReturn(myFridge);
+        
+        FridgeRequest fridgeRequest = new FridgeRequest();
+        fridgeRequest.setId(myFridge.getId());
+        fridgeRequest.setNickname(myFridge.getNickname());
+        fridgeRequest.setUserId(myFridge.getUserId());
+        fridgeRequest.setFoods(myFridge.getFoods());
+        
         URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
         mvc.perform(MockMvcRequestBuilders.put(uri)
-                .content(mapper.writeValueAsString(myFridge))
+                .content(mapper.writeValueAsString(fridgeRequest))
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
@@ -141,6 +152,16 @@ public class FridgeControllerTests {
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
         verify(fridgeService, times(1)).removeAll();
+    }
+    
+    @Test
+    public void loadMyFridge() throws Exception {
+        given(fridgeRepository.findByUserId(anyLong())).willReturn(myFridge);
+        
+        URI uri = UriComponentsBuilder.fromUriString("/fridges/me/{userId}").buildAndExpand(USER_ID).toUri();
+        final ResultActions resultAction = mvc.perform(get(uri));
+        resultAction.andExpect(status().isOk());
+        verifyResultActions(resultAction);
     }
     
 }

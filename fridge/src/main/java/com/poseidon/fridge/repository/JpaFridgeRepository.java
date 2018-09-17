@@ -7,5 +7,6 @@ import com.poseidon.fridge.model.Fridge;
 
 @Repository
 public interface JpaFridgeRepository extends JpaRepository<Fridge, Integer> {
+    Fridge findByUserId(Long userId);
 
 }

@@ -14,4 +14,6 @@ public class FridgeResource extends ResourceSupport {
     String nickname;
     @JsonProperty
     List<Food> foods;
+    @JsonProperty
+    Long userId;
 }

@@ -54,8 +54,7 @@ public class FridgeController {
             return "fridges/registerFridgeForm";
         }
         
-        String nickname = fridgeCommand.getNickname();
-        ResponseEntity<FridgeCommand> response = restTemplate.postForEntity("/fridges", nickname, FridgeCommand.class);
+        ResponseEntity<FridgeCommand> response = restTemplate.postForEntity("/fridges", fridgeCommand, FridgeCommand.class);
         if(response.getStatusCode().is2xxSuccessful()) {
             ra.addFlashAttribute("registerMessage", fridgeCommand.getNickname() + "을 생성했습니다.");
         }

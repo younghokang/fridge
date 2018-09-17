@@ -36,7 +36,9 @@ public class Fridge {
     
     public Fridge(String nickname, List<Food> foods) {
         this.nickname = nickname;
-        this.foods.addAll(foods);
+        if(foods != null) {
+            this.foods.addAll(foods);
+        }
     }
 
     public Integer getId() {

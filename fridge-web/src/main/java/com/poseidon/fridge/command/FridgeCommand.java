@@ -13,6 +13,7 @@ public class FridgeCommand {
     @Size(min=2, max=15)
     private String nickname;
     private List<FoodCommand> foods;
+    private Long userId;
     public Integer getId() {
         return id;
     }
@@ -30,6 +31,12 @@ public class FridgeCommand {
     }
     public void setFoods(List<FoodCommand> foods) {
         this.foods = foods;
+    }
+    public Long getUserId() {
+        return userId;
+    }
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
 }

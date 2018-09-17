@@ -60,8 +60,12 @@ public abstract class ControllerBase {
         browser.quit();
     }
     
-    protected FridgeCommand createFridge(String nickname) {
-        ResponseEntity<FridgeCommand> response = restTemplate.postForEntity(CORE_API_URL + "/fridges", nickname, FridgeCommand.class);
+    protected FridgeCommand createFridge(String nickname, long userId) {
+        FridgeCommand fridgeCommand = new FridgeCommand();
+        fridgeCommand.setNickname(nickname);
+        fridgeCommand.setUserId(userId);
+        
+        ResponseEntity<FridgeCommand> response = restTemplate.postForEntity(CORE_API_URL + "/fridges", fridgeCommand, FridgeCommand.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         FridgeCommand fridge = response.getBody();
         assertThat(fridge.getId()).isPositive();

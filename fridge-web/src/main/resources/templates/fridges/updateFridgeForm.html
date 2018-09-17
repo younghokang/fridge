@@ -4,7 +4,7 @@
   <title>Fridge</title>
 </head>
 <body>
-    <div layout:fragment="content" class="container">
+    <div layout:fragment="content">
 	  <h2>냉장고 상세</h2>
 	  <form th:action="@{/fridges/{id}(id=${fridgeCommand.id})}" th:object="${fridgeCommand}" th:method="put">
 		<div th:if="${#fields.hasErrors('*')}">
@@ -12,6 +12,9 @@
 		        <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
 		    </ul>
 		</div>
+		<label for="userId">회원번호:
+            <input type="text" th:field="*{userId}" />
+        </label>
 	    <label for="nickname">이름: 
 		    <input type="text" th:field="*{nickname}" />
 	    </label><br/>

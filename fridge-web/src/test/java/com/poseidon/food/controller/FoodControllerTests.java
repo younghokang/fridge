@@ -29,7 +29,7 @@ public class FoodControllerTests extends ControllerBase {
     
     @Override
     protected void setUp() {
-        fridge = createFridge("myFridge");
+        fridge = createFridge("나의 냉장고", 1004L);
         
         FoodCommand foodCommand = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
         foodCommand.setFridge(fridge);

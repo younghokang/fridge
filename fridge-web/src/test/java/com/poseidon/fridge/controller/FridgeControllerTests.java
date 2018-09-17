@@ -26,7 +26,7 @@ public class FridgeControllerTests extends ControllerBase {
     
     @Override
     protected void setUp() {
-        fridge = createFridge("나의 냉장고");
+        fridge = createFridge("나의 냉장고", 1004L);
     }
     
     @Test
@@ -43,15 +43,14 @@ public class FridgeControllerTests extends ControllerBase {
     public void fillInCreateFormAndSubmit() {
         browser.get(BASE_URL + "/fridges/add");
         
-        String nickname = "myFridge";
-        WebElement nicknameElement = browser.findElement(By.name("nickname"));
-        nicknameElement.sendKeys(nickname);
+        browser.findElement(By.name("nickname")).sendKeys(fridge.getNickname());
+        browser.findElement(By.name("userId")).sendKeys(Long.toString(fridge.getUserId()));
         browser.findElementByTagName("form").submit();
         
         WebDriverWait wait = new WebDriverWait(browser, 10);
         wait.until(ExpectedConditions.alertIsPresent());
         Alert alert = browser.switchTo().alert();
-        assertThat(alert.getText()).isEqualTo(nickname + "을 생성했습니다.");
+        assertThat(alert.getText()).isEqualTo(fridge.getNickname() + "을 생성했습니다.");
         alert.accept();
     }
     

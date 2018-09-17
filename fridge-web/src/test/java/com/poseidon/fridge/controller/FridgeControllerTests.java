@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.assertj.core.api.Condition;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -23,113 +23,21 @@ import com.poseidon.fridge.command.FridgeCommand;
 
 public class FridgeControllerTests extends ControllerBase {
     private FridgeCommand fridge;
+    private static final Long USER_ID = 1004L;
+    private FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     
     @Override
     protected void setUp() {
-        fridge = createFridge("나의 냉장고", 1004L);
+        fridge = createFridge("나의 냉장고", USER_ID);
     }
-    
-    @Test
-    public void findCreateFridgeButtonAndClick() {
-        browser.get(BASE_URL + "/fridges");
-        WebElement createFridgeBtn = browser.findElementById("btnCreateFridge");
-        assertThat(createFridgeBtn).isNotNull();
-        
-        createFridgeBtn.click();
-        assertThat(browser.getCurrentUrl()).isEqualTo(BASE_URL + "/fridges/add");
-    }
-    
-    @Test
-    public void fillInCreateFormAndSubmit() {
-        browser.get(BASE_URL + "/fridges/add");
-        
-        browser.findElement(By.name("nickname")).sendKeys(fridge.getNickname());
-        browser.findElement(By.name("userId")).sendKeys(Long.toString(fridge.getUserId()));
-        browser.findElementByTagName("form").submit();
-        
-        WebDriverWait wait = new WebDriverWait(browser, 10);
-        wait.until(ExpectedConditions.alertIsPresent());
-        Alert alert = browser.switchTo().alert();
-        assertThat(alert.getText()).isEqualTo(fridge.getNickname() + "을 생성했습니다.");
-        alert.accept();
-    }
-    
-    @Test
-    public void clickAnchorTagFromFridges() {
-        browser.get(BASE_URL + "/fridges");
-        
-        String viewPageUrl = BASE_URL + "/fridges/" + fridge.getId();
-        
-        List<WebElement> anchors = browser.findElementsByLinkText(fridge.getNickname());
-        assertThat(anchors).filteredOn(new Condition<WebElement>() {
-            @Override
-            public boolean matches(WebElement element) {
-                return element.getAttribute("href").equals(viewPageUrl);
-            }
-        });
-        
-        WebElement anchorTag = anchors.stream()
-                .filter(element -> element.getAttribute("href").equals(viewPageUrl))
-                .findAny()
-                .orElse(null);
-        
-        anchorTag.click();
-        
-        assertThat(browser.getCurrentUrl()).isEqualTo(viewPageUrl);
-    }
-    
-    @Test
-    public void changeNickNameAndSubmit() {
-        browser.get(BASE_URL + "/fridges/" + fridge.getId());
-        
-        String changeNickname = "otherFridge";
-        WebElement nicknameElement = browser.findElement(By.name("nickname"));
-        assertThat(nicknameElement.getAttribute("value")).isEqualTo(fridge.getNickname());
-        
-        nicknameElement.clear();
-        nicknameElement.sendKeys(changeNickname);
-        browser.findElementByTagName("form").submit();
-        
-        WebDriverWait wait = new WebDriverWait(browser, 10);
-        wait.until(ExpectedConditions.alertIsPresent());
-        
-        Alert alert = browser.switchTo().alert();
-        assertThat(alert.getText()).isEqualTo(changeNickname + "을 수정했습니다.");
-        alert.accept();
-        
-        browser.get(BASE_URL + "/fridges/" + fridge.getId());
-        assertThat(browser.findElement(By.name("nickname")).getAttribute("value")).isEqualTo(changeNickname);
-    }
-    
-    @Test
-    public void clickDeleteFridgeButton() {
-        browser.get(BASE_URL + "/fridges/" + fridge.getId());
-        
-        WebElement deleteBtn = browser.findElement(By.linkText("삭제"));
-        assertThat(deleteBtn.getAttribute("href")).isEqualTo(BASE_URL + "/fridges/delete/" + fridge.getId());
-        deleteBtn.click();
-        
-        WebDriverWait wait = new WebDriverWait(browser, 10);
-        wait.until(ExpectedConditions.alertIsPresent());
-        Alert alert = browser.switchTo().alert();
-        assertThat(alert.getText()).isEqualTo("삭제했습니다.");
-        alert.accept();
-        
-        ResponseEntity<FridgeCommand> response = restTemplate.getForEntity(CORE_API_URL + "/fridges/" + fridge.getId(), FridgeCommand.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    }
-    
-    private FoodCommand food = new FoodCommand("파스퇴르 우유 1.8L", 1, new Date());
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     
     @Test
     public void hasContentsFromFridgesTable() {
         food.setFridge(fridge);
         FoodCommand foodCommand = createFood(food);
         
-        browser.get(BASE_URL + "/fridges");
-        assertThat(browser.findElement(By.cssSelector("a.nav-link.active")).getText()).isEqualTo(fridge.getNickname());
-        
+        browser.get(BASE_URL + "/fridges/me");
         WebElement table = browser.findElement(By.tagName("table"));
         assertThat(table.isDisplayed()).isTrue();
         
@@ -141,7 +49,43 @@ public class FridgeControllerTests extends ControllerBase {
         assertThat(td.get(1).findElement(By.tagName("a")).getText()).isEqualTo(foodCommand.getName());
         assertThat(td.get(2).getText()).isEqualTo(Integer.toString(foodCommand.getQuantity()));
         assertThat(td.get(3).getText()).isEqualTo(sdf.format(foodCommand.getExpiryDate()));
-        assertThat(td.get(4).findElement(By.tagName("a")).getAttribute("href")).containsPattern(Pattern.compile(BASE_URL + "/foods/delete/[0-9]"));
+        assertThat(td.get(4).findElement(By.tagName("a")).getAttribute("href")).containsPattern(Pattern.compile(BASE_URL + "/fridges/foods/delete/[0-9]"));
+    }
+    
+    @Test
+    public void findRegistrationFoodButtonAndClick() {
+        browser.get(BASE_URL + "/fridges/me");
+        browser.findElement(By.id("btnRegistrationFood")).click();
+        assertThat(browser.getCurrentUrl()).isEqualTo(BASE_URL + "/fridges/foods/add?fridge.id=" + fridge.getId());
+    }
+    
+    @Test
+    public void clickDeleteFoodButton() {
+        food.setFridge(fridge);
+        FoodCommand foodCommand = createFood(food);
+        Long id = foodCommand.getId();
+        
+        browser.get(BASE_URL + "/fridges/me");
+        
+        WebElement deleteAnchorElement = browser.findElements(By.tagName("a"))
+            .stream()
+            .filter(element -> {
+                Pattern pattern = Pattern.compile(BASE_URL + "/fridges/foods/delete/[0-9]");
+                Matcher matcher = pattern.matcher(element.getAttribute("href"));
+                return matcher.find();
+            })
+            .findAny()
+            .orElse(null);
+        deleteAnchorElement.click();
+        
+        WebDriverWait wait = new WebDriverWait(browser, 10);
+        wait.until(ExpectedConditions.alertIsPresent());
+        Alert alert = browser.switchTo().alert();
+        assertThat(alert.getText()).isEqualTo("식품을 삭제했습니다.");
+        alert.accept();
+        
+        ResponseEntity<FoodCommand> response = restTemplate.getForEntity(CORE_API_URL + "/foods/" + id, FoodCommand.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
     
 }

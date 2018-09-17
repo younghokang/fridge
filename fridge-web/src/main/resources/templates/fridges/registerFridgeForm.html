@@ -5,7 +5,6 @@
 </head>
 <body>
     <div layout:fragment="content" class="container">
-	  <h2>냉장고 등록</h2>
 	  <form th:action="@{/fridges/add}" th:object="${fridgeCommand}" th:method="post">
 		<div th:if="${#fields.hasErrors('*')}">
 		    <ul>

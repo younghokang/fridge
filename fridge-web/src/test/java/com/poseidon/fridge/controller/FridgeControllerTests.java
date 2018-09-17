@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.assertj.core.api.Condition;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class FridgeControllerTests extends ControllerBase {
     
     @Override
     protected void setUp() {
-        fridge = createFridge("myFridge");
+        fridge = createFridge("나의 냉장고");
     }
     
     @Test
@@ -128,7 +129,7 @@ public class FridgeControllerTests extends ControllerBase {
         FoodCommand foodCommand = createFood(food);
         
         browser.get(BASE_URL + "/fridges");
-        assertThat(browser.findElement(By.tagName("a")).getText()).isEqualTo(fridge.getNickname());
+        assertThat(browser.findElement(By.cssSelector("a.nav-link.active")).getText()).isEqualTo(fridge.getNickname());
         
         WebElement table = browser.findElement(By.tagName("table"));
         assertThat(table.isDisplayed()).isTrue();
@@ -137,10 +138,11 @@ public class FridgeControllerTests extends ControllerBase {
         assertThat(tr.size()).isEqualTo(1);
         
         List<WebElement> td = tr.get(0).findElements(By.tagName("td"));
-        assertThat(td.size()).isEqualTo(3);
-        assertThat(td.get(0).getText()).isEqualTo(foodCommand.getName());
-        assertThat(td.get(1).getText()).isEqualTo(Integer.toString(foodCommand.getQuantity()));
-        assertThat(td.get(2).getText()).isEqualTo(sdf.format(foodCommand.getExpiryDate()));
+        assertThat(td.get(0).getText()).isEqualTo("1");
+        assertThat(td.get(1).findElement(By.tagName("a")).getText()).isEqualTo(foodCommand.getName());
+        assertThat(td.get(2).getText()).isEqualTo(Integer.toString(foodCommand.getQuantity()));
+        assertThat(td.get(3).getText()).isEqualTo(sdf.format(foodCommand.getExpiryDate()));
+        assertThat(td.get(4).findElement(By.tagName("a")).getAttribute("href")).containsPattern(Pattern.compile(BASE_URL + "/foods/delete/[0-9]"));
     }
     
 }

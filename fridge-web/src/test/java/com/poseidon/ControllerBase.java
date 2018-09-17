@@ -41,7 +41,6 @@ public abstract class ControllerBase {
     @Before
     public void init() {
         BASE_URL = host + ":" + port;
-        restTemplate.delete(CORE_API_URL + "/foods", Collections.emptyMap());
         restTemplate.delete(CORE_API_URL + "/fridges", Collections.emptyMap());
         setUp();
     }

@@ -4,26 +4,32 @@
   <title>Food</title>
 </head>
 <body>
-    <div layout:fragment="content" class="container">
-	  <h2>식품 등록</h2>
-	  <form th:action="@{/foods/add}" th:object="${foodCommand}" th:method="post">
-	      <input type="hidden" th:field="*{fridge.id}" />
-		<div th:if="${#fields.hasErrors('*')}">
-		    <ul>
-		        <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
-		    </ul>
-		</div>
-	    <label for="name">이름: 
-		    <input type="text" th:field="*{name}" />
-	    </label><br/>
-	    <label for="quantity">수량: 
-	        <input type="text" th:field="*{quantity}" />
-	    </label><br/>
-	    <label for="expiryDate">유통기한: 
-	        <input type="date" th:field="*{expiryDate}" />
-	    </label><br/>
-	    <button type="submit">저장</button>
-	  </form>
+    <div layout:fragment="content">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="mb-3">식품 추가하기</h4>
+                <form class="needs-validation" th:action="@{/foods/add}" th:object="${foodCommand}" th:method="post" novalidate="novalidate">
+                    <input type="hidden" th:field="*{fridge.id}" />
+                    <div class="mb-3">
+                        <label for="name">식품명:</label> 
+                        <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid" />
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">식품명을 올바르게 입력해주세요.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity">수량:</label>
+                        <input type="text" class="form-control" th:field="*{quantity}" th:errorclass="is-invalid" />
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">수량을 올바르게 입력해주세요.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="expiryDate">유통기한:</label>
+                        <input type="date" class="form-control" th:field="*{expiryDate}" th:errorclass="is-invalid" />
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}">유통기한을 올바르게 입력해주세요.</div>
+                    </div>
+                    <hr class="mb-4" />
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">변경내역 저장</button>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 </html>

@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -68,7 +67,7 @@ public class FridgeControllerTests {
         myFridge = new Fridge("myFridge");
         myFridge.setId(ID);
         myFridge.setUserId(USER_ID);
-        myFridge.addFood(new Food("파스퇴르 우유 1.8L", 1, new Date()));
+        myFridge.addFood(new Food.Builder("파스퇴르 우유 1.8L", 1).build());
     }
     
     @Test
@@ -87,7 +86,7 @@ public class FridgeControllerTests {
         resultAction.andExpect(jsonPath("nickname", equalTo(myFridge.getNickname())));
         resultAction.andExpect(jsonPath("foods[0].name", equalTo(myFridge.getFoods().get(0).getName())));
         resultAction.andExpect(jsonPath("foods[0].quantity", equalTo(myFridge.getFoods().get(0).getQuantity())));
-        resultAction.andExpect(jsonPath("foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().getTime())));
+        resultAction.andExpect(jsonPath("foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().toString())));
     }
     
     @Test
@@ -111,7 +110,7 @@ public class FridgeControllerTests {
             .andExpect(jsonPath("_embedded.fridgeResourceList[0].nickname", equalTo(myFridge.getNickname())))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].name", equalTo(myFridge.getFoods().get(0).getName())))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].quantity", equalTo(myFridge.getFoods().get(0).getQuantity())))
-            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().getTime())))
+            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().toString())))
             .andExpect(jsonPath("_embedded.fridgeResourceList[0]._links.self.href", equalTo(BASE_PATH + "/fridges/" + myFridge.getId().intValue())));
     }
     

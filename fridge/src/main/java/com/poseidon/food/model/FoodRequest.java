@@ -1,6 +1,6 @@
 package com.poseidon.food.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.poseidon.fridge.model.Fridge;
 
@@ -8,7 +8,7 @@ public class FoodRequest {
     private Long id;
     private String name;
     private Integer quantity;
-    private Date expiryDate;
+    private LocalDate expiryDate;
     private Fridge fridge;
     public Long getId() {
         return id;
@@ -28,10 +28,10 @@ public class FoodRequest {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
     public Fridge getFridge() {
@@ -42,12 +42,11 @@ public class FoodRequest {
     }
     
     public Food toFood() {
-        Food food = new Food(getName(), 
-                getQuantity(), 
-                getExpiryDate());
-        food.setId(getId());
-        food.setFridge(getFridge());
-        return food;
+        return new Food.Builder(name, quantity)
+                .expiryDate(expiryDate)
+                .id(id)
+                .fridge(fridge)
+                .build();
     }
     
     @Override

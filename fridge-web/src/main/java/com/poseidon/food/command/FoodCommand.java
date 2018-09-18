@@ -1,6 +1,6 @@
 package com.poseidon.food.command;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -24,16 +24,10 @@ public class FoodCommand {
     private Integer quantity;
     
     @DateTimeFormat(pattern="yyyy-MM-dd")
-    private Date expiryDate;
+    private LocalDate expiryDate;
     private FridgeCommand fridge;
     
     public FoodCommand() {}
-    
-    public FoodCommand(String name, Integer quantity, Date expiryDate) {
-        this.name = name;
-        this.quantity = quantity;
-        this.expiryDate = expiryDate;
-    }
 
     public Long getId() {
         return id;
@@ -53,10 +47,10 @@ public class FoodCommand {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
     public FridgeCommand getFridge() {

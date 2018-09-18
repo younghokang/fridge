@@ -2,8 +2,6 @@ package com.poseidon.fridge.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Date;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +57,7 @@ public class JpaFridgeRepositoryTests {
         Fridge fridge = jpaFridgeRepository.save(new Fridge(nickname));
         assertThat(fridge.hasFood()).isFalse();
         
-        Food milk = new Food("파스퇴르 우유 1.8L", 1, new Date());
+        Food milk = new Food.Builder("파스퇴르 우유 1.8L", 1).build();
         fridge.addFood(milk);
         jpaFridgeRepository.flush();
         

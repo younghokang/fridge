@@ -1,6 +1,6 @@
 package com.poseidon.food.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.springframework.hateoas.ResourceSupport;
 
@@ -15,7 +15,7 @@ public class FoodResource extends ResourceSupport {
     @JsonProperty
     Integer quantity;
     @JsonProperty
-    Date expiryDate;
+    LocalDate expiryDate;
     @JsonProperty
     Fridge fridge;
 }

@@ -2,12 +2,11 @@
 <html layout:decorator="layout/default" xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Fridge</title>
-  <script th:inline="javascript" th:if="${!#strings.isEmpty(message)}">
-  alert([[${message}]]);
-  </script>
 </head>
 <body>
     <div layout:fragment="content">
+      <div class="alert alert-primary" role="alert" th:if="${!#strings.isEmpty(message)}" th:text="${message}">message</div>
+      
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
@@ -22,7 +21,7 @@
           <a class="btn btn-primary btn-lg" role="button" th:href="@{/fridges/foods/add(fridge.id=${fridge.id})}" id="btnRegistrationFood">식품 추가하기</a>
         </div>
         <table class="table" th:if="${not #lists.isEmpty(fridge.foods)}">
-          <thead class="thead-dark">
+          <thead>
             <tr>
               <th scope="col">#</th>
               <th scope="col">식품명</th>
@@ -36,9 +35,9 @@
               <td th:text="${foodStat.count}">number</td>
               <td><a class="btn btn-sm btn-outline-dark" th:href="@{/fridges/foods/{id}(id=${food.id})}" th:text="${food.name}">name</a></td>
               <td th:text="${food.quantity}">1</td>
-              <td th:text="${#dates.format(food.expiryDate, 'yyyy-MM-dd')}">2018-09-09</td>
+              <td th:text="${#temporals.format(food.expiryDate, 'yyyy-MM-dd')}">2018-09-09</td>
               <td>
-                <a class="btn btn-dark btn-sm" role="button" th:href="@{/fridges/foods/delete/{id}(id=${food.id})}">
+                <a class="btn btn-outline-dark btn-sm" role="button" th:href="@{/fridges/foods/delete/{id}(id=${food.id})}">
                   <i class="fas fa-minus"></i>
                 </a>
               </td>
@@ -47,7 +46,9 @@
           <tfoot>
             <tr>
               <td colspan="5">
-                <a class="btn btn-secondary btn-block" role="button" th:href="@{/fridges/foods/add(fridge.id=${fridge.id})}" id="btnRegistrationFood">식품 추가하기</a>
+                <a class="btn btn-outline-info btn-block" role="button" th:href="@{/fridges/foods/add(fridge.id=${fridge.id})}" id="btnRegistrationFood">
+                    <i class="fas fa-plus"></i> 식품 추가하기
+                </a>
               </td>
             </tr>
           </tfoot>

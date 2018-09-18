@@ -9,7 +9,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.net.URI;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class FoodRestServiceTests {
         foodCommand.setId(1L);
         foodCommand.setName("Banana Cake");
         foodCommand.setQuantity(3);
-        foodCommand.setExpiryDate(new Date());
+        foodCommand.setExpiryDate(LocalDate.now());
         foodCommand.setFridge(fridgeCommand);
     }
     

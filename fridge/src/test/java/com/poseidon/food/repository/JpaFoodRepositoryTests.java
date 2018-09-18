@@ -2,10 +2,8 @@ package com.poseidon.food.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,29 +19,16 @@ public class JpaFoodRepositoryTests {
     @Autowired
     JpaFoodRepository jpaFoodRepository;
     
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    private Food cola;
-    
-    @Before
-    public void setUp() throws ParseException {
-        cola = new Food("코카콜라 500mL", 2, sdf.parse("2018-10-30"));
-    }
+    private Food cola = new Food.Builder("코카콜라 500mL", 2)
+            .expiryDate(LocalDate.of(2018, 9, 10))
+            .build();
     
     @Test
     public void save() {
         jpaFoodRepository.save(cola);
         Food food = jpaFoodRepository.findOne(cola.getId());
         assertThat(food.getName()).isEqualTo(cola.getName());
-    }
-    
-    @Test
-    public void update() {
-        jpaFoodRepository.save(cola);
-        
-        cola.decreaseQuantity(1);
-        jpaFoodRepository.flush();
-        Food savedCola = jpaFoodRepository.findOne(cola.getId());
-        assertThat(savedCola.getQuantity()).isEqualTo(1);
+        assertThat(food.getExpiryDate()).isEqualByComparingTo(LocalDate.of(2018, 9, 10));
     }
     
     @Test

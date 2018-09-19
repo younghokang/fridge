@@ -1,6 +1,7 @@
 package com.poseidon.food.command;
 
 import java.time.LocalDate;
+import java.time.Period;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -26,6 +27,8 @@ public class FoodCommand {
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate expiryDate;
     private FridgeCommand fridge;
+    
+    public static final int SHOW_EXPIRY_D_DAYS = -3;
     
     public FoodCommand() {}
 
@@ -59,11 +62,29 @@ public class FoodCommand {
     public void setFridge(FridgeCommand fridge) {
         this.fridge = fridge;
     }
+    
+    public int getExpiryDays() {
+        return Period.between(LocalDate.now(), getExpiryDate()).getDays();
+    }
+    
+    public String showExpiryDDay() {
+        if(getExpiryDays() >= SHOW_EXPIRY_D_DAYS) {
+            if(getExpiryDays() == 0) {
+                return "D-Day";
+            } else if(getExpiryDays() < 0) {
+                return "D" + getExpiryDays();
+            } else if(getExpiryDays() > 0) {
+                return "D+" + getExpiryDays();
+            }
+        }
+        return null;
+    }
 
     @Override
     public String toString() {
         return "FoodCommand [id=" + id + ", name=" + name + ", quantity=" + quantity + ", expiryDate=" + expiryDate
-                + "]";
+                + ", fridge=" + fridge + "]";
     }
-    
+
+
 }

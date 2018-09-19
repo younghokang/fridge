@@ -49,7 +49,7 @@ public class FridgeControllerTests extends ControllerBase {
         assertThat(td.get(0).getText()).isEqualTo("1");
         assertThat(td.get(1).findElement(By.tagName("a")).getText()).isEqualTo(foodCommand.getName());
         assertThat(td.get(2).getText()).isEqualTo(Integer.toString(foodCommand.getQuantity()));
-        assertThat(td.get(3).getText()).isEqualTo(foodCommand.getExpiryDate().toString());
+        assertThat(td.get(3).getText()).isEqualTo(foodCommand.showExpiryDDay());
         assertThat(td.get(4).findElement(By.tagName("a")).getAttribute("href")).containsPattern(Pattern.compile(BASE_URL + "/fridges/foods/delete/[0-9]"));
     }
     

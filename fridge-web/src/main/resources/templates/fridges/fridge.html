@@ -35,7 +35,7 @@
               <td th:text="${foodStat.count}">number</td>
               <td><a class="btn btn-sm btn-outline-dark" th:href="@{/fridges/foods/{id}(id=${food.id})}" th:text="${food.name}">name</a></td>
               <td th:text="${food.quantity}">1</td>
-              <td th:text="${#temporals.format(food.expiryDate, 'yyyy-MM-dd')}">2018-09-09</td>
+              <td th:class="${food.getExpiryDays() ge food.SHOW_EXPIRY_D_DAYS}? 'text-danger'" th:text="${#objects.nullSafe(food.showExpiryDDay(), #temporals.format(food.expiryDate, 'yyyy-MM-dd'))}">2018-09-09</td>
               <td>
                 <a class="btn btn-outline-dark btn-sm" role="button" th:href="@{/fridges/foods/delete/{id}(id=${food.id})}">
                   <i class="fas fa-minus"></i>

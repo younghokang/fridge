@@ -10,6 +10,7 @@ public class FoodRequest {
     private Integer quantity;
     private LocalDate expiryDate;
     private Fridge fridge;
+    
     public Long getId() {
         return id;
     }

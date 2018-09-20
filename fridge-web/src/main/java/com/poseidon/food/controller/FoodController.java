@@ -20,7 +20,7 @@ import com.poseidon.food.command.FoodCommand;
 import com.poseidon.food.service.FoodRestService;
 
 @Controller
-@RequestMapping("/fridges/foods")
+@RequestMapping("/foods")
 @SessionAttributes("foodCommand")
 public class FoodController {
     

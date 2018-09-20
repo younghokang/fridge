@@ -21,12 +21,12 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,63 +35,66 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poseidon.food.model.Food;
 import com.poseidon.fridge.model.Fridge;
 import com.poseidon.fridge.model.FridgeRequest;
 import com.poseidon.fridge.repository.JpaFridgeRepository;
 import com.poseidon.fridge.service.FridgeService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RunWith(SpringRunner.class)
 @WebMvcTest(FridgeController.class)
+@Slf4j
 public class FridgeControllerTests {
     
     @Autowired
     private MockMvc mvc;
     
     @Autowired
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper;
     
     @MockBean
-    private FridgeService fridgeService;
+    private FridgeService service;
     
     @MockBean
-    private JpaFridgeRepository fridgeRepository;
+    private JpaFridgeRepository repository;
     
-    private Fridge myFridge;
     private static final Integer ID = 1;
     private static final Long USER_ID = 1004L;
     private static final String BASE_PATH = "http://localhost";
-    
-    @Before
-    public void setUp() {
-        myFridge = new Fridge("myFridge");
-        myFridge.setId(ID);
-        myFridge.setUserId(USER_ID);
-        myFridge.addFood(new Food.Builder("파스퇴르 우유 1.8L", 1).build());
-    }
+    private Fridge fridge = Fridge.builder()
+            .id(ID)
+            .nickname("myFridge")
+            .userId(USER_ID)
+            .build();
+    private FridgeRequest myFridge = new FridgeRequest(fridge);
     
     @Test
     public void create() throws Exception {
-        when(fridgeService.create(anyString(), anyLong())).thenReturn(myFridge);
+        when(service.create(anyString(), anyLong())).thenReturn(fridge);
         
         final ResultActions resultAction = mvc.perform(post("/fridges")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(mapper.writeValueAsString(myFridge)));
+                .contentType(MediaTypes.HAL_JSON)
+                .content(mapper.writeValueAsString(new FridgeRequest(fridge))));
         resultAction.andExpect(status().isCreated())
             .andExpect(redirectedUrlPattern("**/fridges/{id:\\d+}"));
         verifyResultActions(resultAction);
     }
 
     private void verifyResultActions(final ResultActions resultAction) throws Exception {
-        resultAction.andExpect(jsonPath("nickname", equalTo(myFridge.getNickname())));
-        resultAction.andExpect(jsonPath("foods[0].name", equalTo(myFridge.getFoods().get(0).getName())));
-        resultAction.andExpect(jsonPath("foods[0].quantity", equalTo(myFridge.getFoods().get(0).getQuantity())));
-        resultAction.andExpect(jsonPath("foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().toString())));
+        resultAction.andExpect(jsonPath("id").value(myFridge.getId()));
+        resultAction.andExpect(jsonPath("nickname").value(myFridge.getNickname()));
+        resultAction.andExpect(jsonPath("userId").value(myFridge.getUserId()));
+        resultAction.andExpect(jsonPath("_links").isMap());
+        resultAction.andExpect(jsonPath("_links.self").isNotEmpty());
+        resultAction.andExpect(jsonPath("_links.self.href").value(BASE_PATH + "/fridges/" + myFridge.getId()));
+        resultAction.andExpect(jsonPath("_links.fridges").isNotEmpty());
+        resultAction.andExpect(jsonPath("_links.fridges.href").value(BASE_PATH + "/fridges"));
     }
     
     @Test
     public void loadFridgeById() throws Exception {
-        when(fridgeRepository.findOne(ID)).thenReturn(myFridge);
+        when(repository.findOne(ID)).thenReturn(fridge);
         final ResultActions resultAction = mvc.perform(get("/fridges/" + ID));
         resultAction.andExpect(status().isOk());
         verifyResultActions(resultAction);
@@ -99,63 +102,60 @@ public class FridgeControllerTests {
     
     @Test
     public void findAllFridges() throws Exception {
-        List<Fridge> fridges = Arrays.asList(myFridge);
-        given(fridgeRepository.findAll()).willReturn(fridges);
+        List<Fridge> fridges = Arrays.asList(fridge);
+        given(repository.findAll()).willReturn(fridges);
         
         final ResultActions result = mvc.perform(get("/fridges").accept(MediaType.APPLICATION_JSON_UTF8));
         result.andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(jsonPath("_links").isMap())
             .andExpect(jsonPath("_links.self.href", equalTo(BASE_PATH + "/fridges")))
-            .andExpect(jsonPath("_embedded.fridgeResourceList[0].id", equalTo(myFridge.getId().intValue())))
-            .andExpect(jsonPath("_embedded.fridgeResourceList[0].nickname", equalTo(myFridge.getNickname())))
-            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].name", equalTo(myFridge.getFoods().get(0).getName())))
-            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].quantity", equalTo(myFridge.getFoods().get(0).getQuantity())))
-            .andExpect(jsonPath("_embedded.fridgeResourceList[0].foods[0].expiryDate", equalTo(myFridge.getFoods().get(0).getExpiryDate().toString())))
-            .andExpect(jsonPath("_embedded.fridgeResourceList[0]._links.self.href", equalTo(BASE_PATH + "/fridges/" + myFridge.getId().intValue())));
+            .andExpect(jsonPath("_embedded").isMap())
+            .andExpect(jsonPath("_embedded.fridgeList").isArray())
+            .andExpect(jsonPath("_embedded.fridgeList[0].id", equalTo(myFridge.getId().intValue())))
+            .andExpect(jsonPath("_embedded.fridgeList[0].nickname", equalTo(myFridge.getNickname())))
+            .andExpect(jsonPath("_embedded.fridgeList[0]._links.self.href", equalTo(BASE_PATH + "/fridges/" + myFridge.getId().intValue())));
     }
     
     @Test
     public void put() throws Exception {
-        given(fridgeRepository.findOne(anyInt())).willReturn(myFridge);
-        given(fridgeService.save(any(Fridge.class))).willReturn(myFridge);
+        given(repository.findOne(anyInt())).willReturn(fridge);
+        given(service.save(any(Fridge.class))).willReturn(fridge);
         
-        FridgeRequest fridgeRequest = new FridgeRequest();
-        fridgeRequest.setId(myFridge.getId());
-        fridgeRequest.setNickname(myFridge.getNickname());
-        fridgeRequest.setUserId(myFridge.getUserId());
-        fridgeRequest.setFoods(myFridge.getFoods());
+        FridgeRequest fridgeRequest = new FridgeRequest(fridge);
+        log.info(fridgeRequest.toString());
         
         URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
         mvc.perform(MockMvcRequestBuilders.put(uri)
                 .content(mapper.writeValueAsString(fridgeRequest))
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .contentType(MediaTypes.HAL_JSON))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
     }
     
     @Test
     public void delete() throws Exception {
-        given(fridgeRepository.findOne(anyInt())).willReturn(myFridge);
+        given(repository.findOne(anyInt())).willReturn(fridge);
         URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
         mvc.perform(MockMvcRequestBuilders.delete(uri)
-                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .contentType(MediaTypes.HAL_JSON))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
     }
     
     @Test
     public void deleteAll() throws Exception {
-        doNothing().when(fridgeService).removeAll();
+        doNothing().when(service).removeAll();
         URI uri = UriComponentsBuilder.fromUriString("/fridges").build().toUri();
         mvc.perform(MockMvcRequestBuilders.delete(uri))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
-        verify(fridgeService, times(1)).removeAll();
+        verify(service, times(1)).removeAll();
     }
     
     @Test
     public void loadMyFridge() throws Exception {
-        given(fridgeRepository.findByUserId(anyLong())).willReturn(myFridge);
+        given(repository.findByUserId(anyLong())).willReturn(fridge);
         
         URI uri = UriComponentsBuilder.fromUriString("/fridges/me/{userId}").buildAndExpand(USER_ID).toUri();
         final ResultActions resultAction = mvc.perform(get(uri));

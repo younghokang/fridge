@@ -19,69 +19,76 @@ public class JpaFridgeRepositoryTests {
     @Autowired
     JpaFridgeRepository jpaFridgeRepository;
     
+    String nickname = "myFridge";
+    Fridge fridge = Fridge.builder()
+            .nickname(nickname)
+            .build();
+    
     @Test
     public void createFridge() {
-        String nickname = "myFridge";
-        Fridge fridge = jpaFridgeRepository.save(new Fridge(nickname));
-        assertThat(fridge).isNotNull();
-        assertThat(fridge.getNickname()).isEqualTo(nickname);
-        assertThat(fridge.getNickname()).isNotEqualTo("another nickname");
+        Fridge newFridge = jpaFridgeRepository.save(fridge);
+        assertThat(newFridge).isNotNull();
+        assertThat(newFridge.getNickname()).isEqualTo(nickname);
+        assertThat(newFridge.getNickname()).isNotEqualTo("another nickname");
     }
     
     @Test
     public void update() {
-        Fridge fridge = jpaFridgeRepository.save(new Fridge("myFridge"));
-        assertThat(jpaFridgeRepository.findOne(fridge.getId())).isNotNull();
+        Fridge updatedFridge = jpaFridgeRepository.save(fridge);
+        assertThat(jpaFridgeRepository.findOne(updatedFridge.getId())).isNotNull();
         
-        Fridge changeNicknameFridge = new Fridge("otherFridge");
-        changeNicknameFridge.setId(fridge.getId());
-        jpaFridgeRepository.save(changeNicknameFridge);
+        Fridge replaceFridge = Fridge.builder()
+                .id(updatedFridge.getId())
+                .nickname("otherFridge")
+                .build();
+        jpaFridgeRepository.save(replaceFridge);
         
-        Fridge savedFridge = jpaFridgeRepository.findOne(fridge.getId());
-        assertThat(savedFridge.getNickname()).isEqualTo(changeNicknameFridge.getNickname());
+        Fridge savedFridge = jpaFridgeRepository.findOne(replaceFridge.getId());
+        assertThat(savedFridge.getNickname()).isEqualTo(replaceFridge.getNickname());
     }
     
     @Test
     public void remove() {
-        Fridge fridge = jpaFridgeRepository.save(new Fridge("myFridge"));
-        assertThat(jpaFridgeRepository.findOne(fridge.getId())).isNotNull();
+        Fridge newFridge = jpaFridgeRepository.save(fridge);
+        assertThat(jpaFridgeRepository.findOne(newFridge.getId())).isNotNull();
         assertThat(jpaFridgeRepository.count()).isEqualTo(1L);
         
-        jpaFridgeRepository.delete(fridge.getId());
+        jpaFridgeRepository.delete(newFridge.getId());
         assertThat(jpaFridgeRepository.count()).isZero();
     }
     
     @Test
     public void createFridgeAndAddFoods() {
-        String nickname = "myFridge";
-        Fridge fridge = jpaFridgeRepository.save(new Fridge(nickname));
-        assertThat(fridge.hasFood()).isFalse();
+        Fridge newFridge = jpaFridgeRepository.save(fridge);
+        assertThat(newFridge.getFoods()).isNullOrEmpty();
         
-        Food milk = new Food.Builder("파스퇴르 우유 1.8L", 1).build();
-        fridge.addFood(milk);
+        Food milk = Food.builder()
+                .name("파스퇴르 우유 1.8L")
+                .quantity(1)
+                .build();
+        
+        newFridge.addFood(milk);
         jpaFridgeRepository.flush();
         
-        Fridge dbFridge = jpaFridgeRepository.findOne(fridge.getId());
-        assertThat(dbFridge.hasFood()).isTrue();
+        Fridge dbFridge = jpaFridgeRepository.findOne(newFridge.getId());
         assertThat(dbFridge.getFoods().size()).isEqualTo(1);
         assertThat(dbFridge.getFoods().get(0).getId()).isPositive();
         
         dbFridge.removeFood(milk);
         jpaFridgeRepository.flush();
         
-        assertThat(dbFridge.hasFood()).isFalse();
         assertThat(dbFridge.getFoods().size()).isZero();
     }
     
     @Test
     public void findByUserId() {
         long firstUserId = 1004L;
-        Fridge firstFridge = new Fridge("firstFridge");
-        firstFridge.setUserId(firstUserId);
-        jpaFridgeRepository.save(firstFridge);
+        fridge.setUserId(firstUserId);
+        
+        jpaFridgeRepository.save(fridge);
         
         Fridge dbFirstFridge = jpaFridgeRepository.findByUserId(firstUserId);
-        assertThat(dbFirstFridge).isSameAs(firstFridge);
+        assertThat(dbFirstFridge).isSameAs(fridge);
         
         Fridge notExistFridge = jpaFridgeRepository.findByUserId(Long.MAX_VALUE);
         assertThat(notExistFridge).isNull();
@@ -90,10 +97,8 @@ public class JpaFridgeRepositoryTests {
     @Test(expected=IncorrectResultSizeDataAccessException.class)
     public void tooManyResult() {
         long userId = 1004L;
-        Fridge fridge1 = new Fridge("fridge1");
-        Fridge fridge2 = new Fridge("fridge2");
-        fridge1.setUserId(userId);
-        fridge2.setUserId(userId);
+        Fridge fridge1 = Fridge.builder().nickname("fridge1").userId(userId).build();
+        Fridge fridge2 = Fridge.builder().nickname("fridge2").userId(userId).build();
         jpaFridgeRepository.save(fridge1);
         jpaFridgeRepository.save(fridge2);
         

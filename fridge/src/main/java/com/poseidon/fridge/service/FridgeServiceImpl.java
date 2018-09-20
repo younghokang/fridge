@@ -14,8 +14,10 @@ public class FridgeServiceImpl implements FridgeService {
     
     @Override
     public Fridge create(String nickname, long userId) {
-        Fridge fridge = new Fridge(nickname);
-        fridge.setUserId(userId);
+        Fridge fridge = Fridge.builder()
+                .nickname(nickname)
+                .userId(userId)
+                .build();
         return jpaFridgeRepository.save(fridge);
     }
 

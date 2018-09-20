@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.poseidon.fridge.command.FridgeCommand;
 
 public class FoodCommand {
@@ -63,6 +64,7 @@ public class FoodCommand {
         this.fridge = fridge;
     }
     
+    @JsonIgnore
     public int getExpiryDays() {
         return Period.between(LocalDate.now(), getExpiryDate()).getDays();
     }

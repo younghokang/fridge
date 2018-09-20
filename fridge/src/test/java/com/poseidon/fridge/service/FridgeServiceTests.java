@@ -24,8 +24,11 @@ public class FridgeServiceTests {
     public void createWithUserId() {
         String nickname = "myFridge";
         long userId = 1004L;
-        Fridge newFridge = new Fridge(nickname);
-        newFridge.setUserId(userId);
+        Fridge newFridge = Fridge.builder()
+                .nickname(nickname)
+                .userId(userId)
+                .build();
+        
         when(fridgeService.create(anyString(), anyLong())).thenReturn(newFridge);
         
         Fridge fridge = fridgeService.create(nickname, userId);

@@ -4,43 +4,31 @@ import java.util.List;
 
 import com.poseidon.food.model.Food;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class FridgeRequest {
     private Integer id;
     private String nickname;
     private List<Food> foods;
     private Long userId;
-    public Integer getId() {
-        return id;
+    
+    public FridgeRequest(Fridge fridge) {
+        this.id = fridge.getId();
+        this.nickname = fridge.getNickname();
+        this.userId = fridge.getUserId();
+        this.foods = fridge.getFoods();
     }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    public String getNickname() {
-        return nickname;
-    }
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-    public List<Food> getFoods() {
-        return foods;
-    }
-    public void setFoods(List<Food> foods) {
-        this.foods = foods;
-    }
-    public Long getUserId() {
-        return userId;
-    }
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    
     public Fridge toFridge() {
-        Fridge fridge = new Fridge(getNickname(), getFoods());
-        fridge.setId(getId());
-        fridge.setUserId(getUserId());
-        return fridge;
+        return Fridge.builder()
+                .id(id)
+                .nickname(nickname)
+                .userId(userId)
+                .foods(foods)
+                .build();
     }
-    @Override
-    public String toString() {
-        return "FridgeRequest [id=" + id + ", nickname=" + nickname + ", foods=" + foods + ", userId=" + userId + "]";
-    }
+    
 }

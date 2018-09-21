@@ -6,7 +6,7 @@ import com.poseidon.fridge.model.Fridge;
 
 @Transactional
 public interface FridgeService {
-    Fridge create(String nickname);
+    Fridge create(String nickname, long userId);
 
     Fridge save(Fridge fridge);
 

@@ -7,29 +7,26 @@ import javax.validation.constraints.Size;
 
 import com.poseidon.food.command.FoodCommand;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class FridgeCommand {
     private Integer id;
     @NotNull
     @Size(min=2, max=15)
     private String nickname;
     private List<FoodCommand> foods;
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
+    @NotNull
+    private Long userId;
+    
+    @Builder
+    public FridgeCommand(Integer id, String nickname, Long userId) {
         this.id = id;
-    }
-    public String getNickname() {
-        return nickname;
-    }
-    public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-    public List<FoodCommand> getFoods() {
-        return foods;
-    }
-    public void setFoods(List<FoodCommand> foods) {
-        this.foods = foods;
+        this.userId = userId;
     }
 
 }

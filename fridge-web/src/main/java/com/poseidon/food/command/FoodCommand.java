@@ -1,6 +1,7 @@
 package com.poseidon.food.command;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.Period;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -9,8 +10,14 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.poseidon.fridge.command.FridgeCommand;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class FoodCommand {
     
     private Long id;
@@ -24,52 +31,36 @@ public class FoodCommand {
     private Integer quantity;
     
     @DateTimeFormat(pattern="yyyy-MM-dd")
-    private Date expiryDate;
-    private FridgeCommand fridge;
+    private LocalDate expiryDate;
+    private Integer fridgeId;
     
-    public FoodCommand() {}
+    public static final int SHOW_EXPIRY_D_DAYS = -3;
     
-    public FoodCommand(String name, Integer quantity, Date expiryDate) {
-        this.name = name;
-        this.quantity = quantity;
-        this.expiryDate = expiryDate;
+    @JsonIgnore
+    public int getExpiryDays() {
+        return Period.between(getExpiryDate(), LocalDate.now()).getDays();
     }
-
-    public Long getId() {
-        return id;
+    
+    public String showExpiryDDay() {
+        if(getExpiryDays() >= SHOW_EXPIRY_D_DAYS) {
+            if(getExpiryDays() == 0) {
+                return "D-Day";
+            } else if(getExpiryDays() < 0) {
+                return "D" + getExpiryDays();
+            } else if(getExpiryDays() > 0) {
+                return "D+" + getExpiryDays();
+            }
+        }
+        return null;
     }
-    public void setId(Long id) {
+    
+    @Builder
+    public FoodCommand(Long id, String name, Integer quantity, LocalDate expiryDate, Integer fridgeId) {
         this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
         this.name = name;
-    }
-    public Integer getQuantity() {
-        return quantity;
-    }
-    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-    public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
-    }
-    public FridgeCommand getFridge() {
-        return fridge;
-    }
-    public void setFridge(FridgeCommand fridge) {
-        this.fridge = fridge;
+        this.fridgeId = fridgeId;
     }
 
-    @Override
-    public String toString() {
-        return "FoodCommand [id=" + id + ", name=" + name + ", quantity=" + quantity + ", expiryDate=" + expiryDate
-                + "]";
-    }
-    
 }

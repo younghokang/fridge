@@ -18,7 +18,7 @@ import com.poseidon.fridge.model.Fridge;
 public class FridgeServiceTests {
     
     @Mock
-    FridgeService fridgeService;
+    FridgeService service;
     
     @Test
     public void createWithUserId() {
@@ -29,11 +29,11 @@ public class FridgeServiceTests {
                 .userId(userId)
                 .build();
         
-        when(fridgeService.create(anyString(), anyLong())).thenReturn(newFridge);
+        when(service.create(anyString(), anyLong())).thenReturn(newFridge);
         
-        Fridge fridge = fridgeService.create(nickname, userId);
+        Fridge fridge = service.create(nickname, userId);
         
-        verify(fridgeService, times(1)).create(nickname, userId);
+        verify(service, times(1)).create(nickname, userId);
         
         assertThat(fridge).isSameAs(newFridge);
     }

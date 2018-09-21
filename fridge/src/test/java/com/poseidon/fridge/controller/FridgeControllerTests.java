@@ -9,7 +9,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -20,13 +19,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,7 +39,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseidon.fridge.model.Fridge;
 import com.poseidon.fridge.model.FridgeRequest;
-import com.poseidon.fridge.repository.JpaFridgeRepository;
+import com.poseidon.fridge.repository.FridgeRepository;
 import com.poseidon.fridge.service.FridgeService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +59,10 @@ public class FridgeControllerTests {
     private FridgeService service;
     
     @MockBean
-    private JpaFridgeRepository repository;
+    private FridgeRepository repository;
+    
+    @MockBean
+    private FridgeResourceAssembler assembler;
     
     private static final Integer ID = 1;
     private static final Long USER_ID = 1004L;
@@ -71,7 +76,11 @@ public class FridgeControllerTests {
     
     @Test
     public void create() throws Exception {
-        when(service.create(anyString(), anyLong())).thenReturn(fridge);
+        given(service.create(anyString(), anyLong())).willReturn(fridge);
+        given(assembler.toResource(any(Fridge.class))).willReturn(new Resource<Fridge>(fridge, 
+                new Link(BASE_PATH + "/fridges/" + fridge.getId()),
+                new Link(BASE_PATH + "/fridges", "fridges")
+                ));
         
         final ResultActions resultAction = mvc.perform(post("/fridges")
                 .contentType(MediaTypes.HAL_JSON)
@@ -94,16 +103,33 @@ public class FridgeControllerTests {
     
     @Test
     public void loadFridgeById() throws Exception {
-        when(repository.findOne(ID)).thenReturn(fridge);
+        given(repository.findById(ID)).willReturn(Optional.of(fridge));
+        given(assembler.toResource(any(Fridge.class))).willReturn(new Resource<Fridge>(fridge, 
+                new Link(BASE_PATH + "/fridges/" + fridge.getId()),
+                new Link(BASE_PATH + "/fridges", "fridges")
+                ));
+        
         final ResultActions resultAction = mvc.perform(get("/fridges/" + ID));
         resultAction.andExpect(status().isOk());
         verifyResultActions(resultAction);
     }
     
     @Test
+    public void notFoundFridge() throws Exception {
+        given(repository.findById(ID)).willReturn(Optional.empty());
+        mvc.perform(get("/fridges/" + ID))
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("could not found fridge #" + ID));
+    }
+    
+    @Test
     public void findAllFridges() throws Exception {
         List<Fridge> fridges = Arrays.asList(fridge);
         given(repository.findAll()).willReturn(fridges);
+        given(assembler.toResource(any(Fridge.class))).willReturn(new Resource<Fridge>(fridge, 
+                new Link(BASE_PATH + "/fridges/" + fridge.getId()),
+                new Link(BASE_PATH + "/fridges", "fridges")
+                ));
         
         final ResultActions result = mvc.perform(get("/fridges").accept(MediaType.APPLICATION_JSON_UTF8));
         result.andExpect(status().isOk())
@@ -119,18 +145,22 @@ public class FridgeControllerTests {
     
     @Test
     public void put() throws Exception {
-        given(repository.findOne(anyInt())).willReturn(fridge);
+        given(repository.findById(anyInt())).willReturn(Optional.of(fridge));
         given(service.save(any(Fridge.class))).willReturn(fridge);
+        log.info(myFridge.toString());
         
-        FridgeRequest fridgeRequest = new FridgeRequest(fridge);
-        log.info(fridgeRequest.toString());
+        given(assembler.toResource(any(Fridge.class))).willReturn(new Resource<Fridge>(fridge, 
+                new Link(BASE_PATH + "/fridges/" + fridge.getId()),
+                new Link(BASE_PATH + "/fridges", "fridges")
+                ));
         
         URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
-        mvc.perform(MockMvcRequestBuilders.put(uri)
-                .content(mapper.writeValueAsString(fridgeRequest))
-                .contentType(MediaTypes.HAL_JSON))
-            .andExpect(status().isNoContent())
-            .andExpect(content().string(""));
+        final ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.put(uri)
+                .content(mapper.writeValueAsString(myFridge))
+                .contentType(MediaTypes.HAL_JSON));
+        resultAction.andExpect(status().isCreated())
+            .andExpect(redirectedUrlPattern("**/fridges/{id:\\d+}"));
+        verifyResultActions(resultAction);
     }
     
     @Test
@@ -155,7 +185,11 @@ public class FridgeControllerTests {
     
     @Test
     public void loadMyFridge() throws Exception {
-        given(repository.findByUserId(anyLong())).willReturn(fridge);
+        given(repository.findByUserId(anyLong())).willReturn(Optional.of(fridge));
+        given(assembler.toResource(any(Fridge.class))).willReturn(new Resource<Fridge>(fridge, 
+                new Link(BASE_PATH + "/fridges/" + fridge.getId()),
+                new Link(BASE_PATH + "/fridges", "fridges")
+                ));
         
         URI uri = UriComponentsBuilder.fromUriString("/fridges/me/{userId}").buildAndExpand(USER_ID).toUri();
         final ResultActions resultAction = mvc.perform(get(uri));

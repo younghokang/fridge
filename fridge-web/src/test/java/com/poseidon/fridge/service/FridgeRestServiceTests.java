@@ -5,17 +5,18 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withCreatedEntity;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.io.IOException;
 import java.net.URI;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -38,15 +39,11 @@ public class FridgeRestServiceTests {
     @Autowired
     private ObjectMapper mapper;
     
-    private FridgeCommand fridgeCommand;
-    
-    @Before
-    public void setUp() {
-        fridgeCommand = new FridgeCommand();
-        fridgeCommand.setId(1);
-        fridgeCommand.setNickname("myFridge");
-        fridgeCommand.setUserId(1004L);
-    }
+    private FridgeCommand fridgeCommand = FridgeCommand.builder()
+            .id(1)
+            .nickname("myFridge")
+            .userId(1004L)
+            .build();
     
     @Test
     public void loadByUserId() throws IOException {
@@ -58,6 +55,17 @@ public class FridgeRestServiceTests {
         
         server.verify();
         assertThat(fridge).isEqualToComparingFieldByField(fridgeCommand);
+    }
+    
+    @Test
+    public void whenLoadByUserIdThenNotFoundHttpStatus() {
+        server.expect(requestTo("/fridges/me/" + fridgeCommand.getUserId()))
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(withStatus(HttpStatus.NOT_FOUND));
+        
+        service.loadByUserId(fridgeCommand.getUserId());
+        
+        server.verify();
     }
     
     @Test

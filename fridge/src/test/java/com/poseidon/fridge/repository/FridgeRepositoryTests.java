@@ -14,10 +14,10 @@ import com.poseidon.fridge.model.Fridge;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class JpaFridgeRepositoryTests {
+public class FridgeRepositoryTests {
     
     @Autowired
-    JpaFridgeRepository jpaFridgeRepository;
+    FridgeRepository repository;
     
     String nickname = "myFridge";
     Fridge fridge = Fridge.builder()
@@ -26,7 +26,7 @@ public class JpaFridgeRepositoryTests {
     
     @Test
     public void createFridge() {
-        Fridge newFridge = jpaFridgeRepository.save(fridge);
+        Fridge newFridge = repository.save(fridge);
         assertThat(newFridge).isNotNull();
         assertThat(newFridge.getNickname()).isEqualTo(nickname);
         assertThat(newFridge.getNickname()).isNotEqualTo("another nickname");
@@ -34,32 +34,32 @@ public class JpaFridgeRepositoryTests {
     
     @Test
     public void update() {
-        Fridge updatedFridge = jpaFridgeRepository.save(fridge);
-        assertThat(jpaFridgeRepository.findOne(updatedFridge.getId())).isNotNull();
+        Fridge updatedFridge = repository.save(fridge);
+        assertThat(repository.findOne(updatedFridge.getId())).isNotNull();
         
         Fridge replaceFridge = Fridge.builder()
                 .id(updatedFridge.getId())
                 .nickname("otherFridge")
                 .build();
-        jpaFridgeRepository.save(replaceFridge);
+        repository.save(replaceFridge);
         
-        Fridge savedFridge = jpaFridgeRepository.findOne(replaceFridge.getId());
+        Fridge savedFridge = repository.findOne(replaceFridge.getId());
         assertThat(savedFridge.getNickname()).isEqualTo(replaceFridge.getNickname());
     }
     
     @Test
     public void remove() {
-        Fridge newFridge = jpaFridgeRepository.save(fridge);
-        assertThat(jpaFridgeRepository.findOne(newFridge.getId())).isNotNull();
-        assertThat(jpaFridgeRepository.count()).isEqualTo(1L);
+        Fridge newFridge = repository.save(fridge);
+        assertThat(repository.findOne(newFridge.getId())).isNotNull();
+        assertThat(repository.count()).isEqualTo(1L);
         
-        jpaFridgeRepository.delete(newFridge.getId());
-        assertThat(jpaFridgeRepository.count()).isZero();
+        repository.delete(newFridge.getId());
+        assertThat(repository.count()).isZero();
     }
     
     @Test
     public void createFridgeAndAddFoods() {
-        Fridge newFridge = jpaFridgeRepository.save(fridge);
+        Fridge newFridge = repository.save(fridge);
         assertThat(newFridge.getFoods()).isNullOrEmpty();
         
         Food milk = Food.builder()
@@ -68,14 +68,14 @@ public class JpaFridgeRepositoryTests {
                 .build();
         
         newFridge.addFood(milk);
-        jpaFridgeRepository.flush();
+        repository.flush();
         
-        Fridge dbFridge = jpaFridgeRepository.findOne(newFridge.getId());
+        Fridge dbFridge = repository.findOne(newFridge.getId());
         assertThat(dbFridge.getFoods().size()).isEqualTo(1);
         assertThat(dbFridge.getFoods().get(0).getId()).isPositive();
         
         dbFridge.removeFood(milk);
-        jpaFridgeRepository.flush();
+        repository.flush();
         
         assertThat(dbFridge.getFoods().size()).isZero();
     }
@@ -85,13 +85,11 @@ public class JpaFridgeRepositoryTests {
         long firstUserId = 1004L;
         fridge.setUserId(firstUserId);
         
-        jpaFridgeRepository.save(fridge);
+        repository.save(fridge);
         
-        Fridge dbFirstFridge = jpaFridgeRepository.findByUserId(firstUserId);
+        Fridge dbFirstFridge = repository.findByUserId(firstUserId)
+                .orElse(new Fridge());
         assertThat(dbFirstFridge).isSameAs(fridge);
-        
-        Fridge notExistFridge = jpaFridgeRepository.findByUserId(Long.MAX_VALUE);
-        assertThat(notExistFridge).isNull();
     }
     
     @Test(expected=IncorrectResultSizeDataAccessException.class)
@@ -99,10 +97,10 @@ public class JpaFridgeRepositoryTests {
         long userId = 1004L;
         Fridge fridge1 = Fridge.builder().nickname("fridge1").userId(userId).build();
         Fridge fridge2 = Fridge.builder().nickname("fridge2").userId(userId).build();
-        jpaFridgeRepository.save(fridge1);
-        jpaFridgeRepository.save(fridge2);
+        repository.save(fridge1);
+        repository.save(fridge2);
         
-        jpaFridgeRepository.findByUserId(userId);
+        repository.findByUserId(userId);
     }
 
 }

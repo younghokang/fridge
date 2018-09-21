@@ -2,7 +2,6 @@ package com.poseidon.food.controller;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -19,13 +18,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.poseidon.food.command.FoodCommand;
 import com.poseidon.food.service.FoodRestService;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
-@RequestMapping("/foods")
+@RequestMapping("/fridges/{fridgeId}/foods")
 @SessionAttributes("foodCommand")
+@RequiredArgsConstructor
 public class FoodController {
-    
-    @Autowired
-    private FoodRestService foodRestService;
+    private final FoodRestService service;
     
     @GetMapping("/add")
     public String registerFoodForm(FoodCommand foodCommand, Model model) {
@@ -42,7 +42,7 @@ public class FoodController {
             return "foods/registerFoodForm";
         }
         
-        if(foodRestService.create(foodCommand) != null) {
+        if(service.create(foodCommand) != null) {
             ra.addFlashAttribute("message", "식품을 저장했습니다.");
             sessionStatus.setComplete();
         }
@@ -50,8 +50,11 @@ public class FoodController {
     }
     
     @GetMapping("/{id}")
-    public String updateFoodForm(@PathVariable long id, Model model) {
-        model.addAttribute("foodCommand", foodRestService.loadById(id));
+    public String updateFoodForm(@PathVariable("fridgeId") Integer fridgeId, 
+            @PathVariable long id, Model model) {
+        FoodCommand foodCommand = service.loadById(id);
+        foodCommand.setFridgeId(fridgeId);
+        model.addAttribute("foodCommand", foodCommand);
         return "foods/updateFoodForm";
     }
     
@@ -65,7 +68,7 @@ public class FoodController {
             return "foods/updateFoodForm";
         }
         
-        foodRestService.update(foodCommand, id);
+        service.update(foodCommand, id);
         ra.addFlashAttribute("message", "식품을 저장했습니다.");
         sessionStatus.setComplete();
         return "redirect:/fridges/me";
@@ -73,7 +76,7 @@ public class FoodController {
     
     @GetMapping("/delete/{id}")
     public String deleteFood(@PathVariable long id, RedirectAttributes ra) {
-        foodRestService.delete(id);
+        service.delete(id);
         ra.addFlashAttribute("message", "식품을 삭제했습니다.");
         return "redirect:/fridges/me";
     }

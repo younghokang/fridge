@@ -18,7 +18,7 @@
         <div class="card-body" th:if="${#lists.isEmpty(fridge.foods)}">
           <h5 class="card-title">냉장고를 채워주세요.</h5>
           <p class="card-text">식품 추가하기 버튼을 눌러서 보관하실 식품을 추가해보세요!</p>
-          <a class="btn btn-primary btn-lg" role="button" th:href="@{/fridges/foods/add(fridge.id=${fridge.id})}" id="btnRegistrationFood">식품 추가하기</a>
+          <a class="btn btn-primary btn-lg" role="button" th:href="@{/fridges/{fridgeId}/foods/add(fridgeId=${fridge.id})}" id="btnRegistrationFood">식품 추가하기</a>
         </div>
         <table class="table" th:if="${not #lists.isEmpty(fridge.foods)}">
           <thead>
@@ -33,11 +33,11 @@
           <tbody>
             <tr th:each="food, foodStat : ${fridge.foods}">
               <td th:text="${foodStat.count}">number</td>
-              <td><a class="btn btn-sm btn-outline-dark" th:href="@{/fridges/foods/{id}(id=${food.id})}" th:text="${food.name}">name</a></td>
+              <td><a class="btn btn-sm btn-outline-dark" th:href="@{/fridges/{fridgeId}/foods/{id}(fridgeId=${fridge.id},id=${food.id})}" th:text="${food.name}">name</a></td>
               <td th:text="${food.quantity}">1</td>
               <td th:class="${food.getExpiryDays() ge food.SHOW_EXPIRY_D_DAYS}? 'text-danger'" th:text="${#objects.nullSafe(food.showExpiryDDay(), #temporals.format(food.expiryDate, 'yyyy-MM-dd'))}">2018-09-09</td>
               <td>
-                <a class="btn btn-outline-dark btn-sm" role="button" th:href="@{/fridges/foods/delete/{id}(id=${food.id})}">
+                <a class="btn btn-outline-dark btn-sm" role="button" th:href="@{/fridges/{fridgeId}/foods/delete/{id}(fridgeId=${fridge.id},id=${food.id})}">
                   <i class="fas fa-minus"></i>
                 </a>
               </td>
@@ -46,7 +46,7 @@
           <tfoot>
             <tr>
               <td colspan="5">
-                <a class="btn btn-outline-info btn-block" role="button" th:href="@{/fridges/foods/add(fridge.id=${fridge.id})}" id="btnRegistrationFood">
+                <a class="btn btn-outline-info btn-block" role="button" th:href="@{/fridges/{fridgeId}/foods/add(fridgeId=${fridge.id})}" id="btnRegistrationFood">
                     <i class="fas fa-plus"></i> 식품 추가하기
                 </a>
               </td>

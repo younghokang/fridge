@@ -5,9 +5,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.stereotype.Component;
 
 import com.poseidon.fridge.model.Fridge;
 
+@Component
 public class FridgeResourceAssembler implements ResourceAssembler<Fridge, Resource<Fridge>> {
 
     @Override

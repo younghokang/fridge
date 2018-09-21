@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.poseidon.fridge.model.Fridge;
 import com.poseidon.fridge.model.FridgeRequest;
-import com.poseidon.fridge.repository.JpaFridgeRepository;
+import com.poseidon.fridge.repository.FridgeRepository;
 import com.poseidon.fridge.service.FridgeService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,10 +31,9 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/fridges")
 public class FridgeController {
-    
     private final FridgeService service;
-    private final JpaFridgeRepository repository;
-    private FridgeResourceAssembler assembler = new FridgeResourceAssembler();
+    private final FridgeRepository repository;
+    private final FridgeResourceAssembler assembler;
     
     @PostMapping
     ResponseEntity<?> create(@RequestBody final FridgeRequest fridgeRequest) throws URISyntaxException {
@@ -46,7 +45,8 @@ public class FridgeController {
     
     @GetMapping("/{id}")
     Resource<Fridge> loadFridgeById(@PathVariable final int id) {
-        Fridge fridge = repository.findOne(id);
+        Fridge fridge = repository.findById(id)
+                .orElseThrow(() -> new FridgeNotFoundException(id));
         return assembler.toResource(fridge);
     }
     
@@ -61,11 +61,19 @@ public class FridgeController {
     }
     
     @PutMapping("/{id}")
-    ResponseEntity<?> updateFridge(@PathVariable final int id, @RequestBody final FridgeRequest fridgeRequest) {
-        if(repository.findOne(id) != null) {
-            service.save(fridgeRequest.toFridge());
-        }
-        return ResponseEntity.noContent().build();
+    ResponseEntity<?> updateFridge(@PathVariable final int id, @RequestBody final FridgeRequest fridgeRequest) throws URISyntaxException {
+        Fridge updatedFridge = repository.findById(id)
+                .map(fridge -> {
+                    fridge.setNickname(fridgeRequest.getNickname());
+                    return repository.save(fridge);
+                })
+                .orElseGet(() -> {
+                    fridgeRequest.setId(id);
+                    return repository.save(fridgeRequest.toFridge());
+                });
+        Resource<Fridge> resource = assembler.toResource(updatedFridge);
+        return ResponseEntity.created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
     
     @DeleteMapping("/{id}")
@@ -82,7 +90,8 @@ public class FridgeController {
     
     @GetMapping("/me/{userId}")
     Resource<Fridge> loadMyFridge(@PathVariable final long userId) {
-        Fridge fridge = repository.findByUserId(userId);
+        Fridge fridge = repository.findByUserId(userId)
+                .orElseThrow(() -> new FridgeNotFoundException(userId));
         return assembler.toResource(fridge);
     }
     

@@ -17,13 +17,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,7 +37,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseidon.food.model.Food;
 import com.poseidon.food.model.FoodRequest;
-import com.poseidon.food.repository.JpaFoodRepository;
+import com.poseidon.food.repository.FoodRepository;
 import com.poseidon.food.service.FoodService;
 import com.poseidon.fridge.model.Fridge;
 
@@ -49,10 +52,13 @@ public class FoodControllerTests {
     private ObjectMapper mapper = new ObjectMapper();
     
     @MockBean
-    private JpaFoodRepository jpaFoodRepository;
+    private FoodRepository repository;
     
     @MockBean
-    private FoodService foodService;
+    private FoodService service;
+    
+    @MockBean
+    private FoodResourceAssembler assembler;
     
     private Food milk = Food.builder()
             .id(ID)
@@ -69,7 +75,10 @@ public class FoodControllerTests {
     @Test
     public void findAllFoods() throws Exception {
         List<Food> foods = Arrays.asList(milk);
-        given(jpaFoodRepository.findAll()).willReturn(foods);
+        given(repository.findAll()).willReturn(foods);
+        given(assembler.toResource(any(Food.class))).willReturn(new Resource<Food>(milk,
+                new Link(BASE_PATH + "/foods/" + milk.getId()),
+                new Link(BASE_PATH + "/foods", "foods")));
         
         final ResultActions result = mvc.perform(get("/foods")
                 .accept(MediaType.APPLICATION_JSON_UTF8));
@@ -85,12 +94,16 @@ public class FoodControllerTests {
     
     @Test
     public void findById() throws Exception {
+        given(repository.findById(ID)).willReturn(Optional.of(milk));
+        given(assembler.toResource(any(Food.class))).willReturn(new Resource<Food>(milk,
+                new Link(BASE_PATH + "/foods/" + milk.getId()),
+                new Link(BASE_PATH + "/foods", "foods")));
+        
         URI uri = UriComponentsBuilder
                 .fromUriString("/foods/{id}")
                 .buildAndExpand(ID)
                 .toUri();
         
-        given(jpaFoodRepository.findOne(ID)).willReturn(milk);
         final ResultActions result = mvc.perform(get(uri));
         result.andExpect(status().isOk());
         verifyResultContent(result);
@@ -107,7 +120,10 @@ public class FoodControllerTests {
 
     @Test
     public void postSave() throws Exception {
-        given(foodService.save(any(Food.class))).willReturn(milk);
+        given(service.save(any(Food.class))).willReturn(milk);
+        given(assembler.toResource(any(Food.class))).willReturn(new Resource<Food>(milk,
+                new Link(BASE_PATH + "/foods/" + milk.getId()),
+                new Link(BASE_PATH + "/foods", "foods")));
         
         final ResultActions result = mvc.perform(post("/foods")
                 .content(mapper.writeValueAsString(foodRequest))
@@ -119,19 +135,24 @@ public class FoodControllerTests {
     
     @Test
     public void put() throws Exception {
-        given(jpaFoodRepository.findOne(anyLong())).willReturn(milk);
-        given(foodService.save(any(Food.class))).willReturn(milk);
+        given(repository.findById(anyLong())).willReturn(Optional.of(milk));
+        given(service.save(any(Food.class))).willReturn(milk);
+        given(assembler.toResource(any(Food.class))).willReturn(new Resource<Food>(milk,
+                new Link(BASE_PATH + "/foods/" + milk.getId()),
+                new Link(BASE_PATH + "/foods", "foods")));
+        
         URI uri = UriComponentsBuilder.fromUriString("/foods/{id}").buildAndExpand(ID).toUri();
-        mvc.perform(MockMvcRequestBuilders.put(uri)
+        final ResultActions result = mvc.perform(MockMvcRequestBuilders.put(uri)
                 .content(mapper.writeValueAsString(foodRequest))
-                .contentType(MediaTypes.HAL_JSON))
-            .andExpect(status().isNoContent())
-            .andExpect(content().string(""));
+                .contentType(MediaTypes.HAL_JSON));
+        result.andExpect(status().isCreated())
+            .andExpect(redirectedUrlPattern("**/foods/{id:\\d+}"));
+        verifyResultContent(result);
     }
     
     @Test
     public void delete() throws Exception {
-        given(jpaFoodRepository.findOne(anyLong())).willReturn(milk);
+        given(repository.findOne(anyLong())).willReturn(milk);
         URI uri = UriComponentsBuilder.fromUriString("/foods/{id}").buildAndExpand(ID).toUri();
         mvc.perform(MockMvcRequestBuilders.delete(uri)
                 .contentType(MediaTypes.HAL_JSON))
@@ -141,13 +162,13 @@ public class FoodControllerTests {
     
     @Test
     public void deleteAll() throws Exception {
-        doNothing().when(foodService).removeAll();
+        doNothing().when(service).removeAll();
         URI uri = UriComponentsBuilder.fromUriString("/foods").build().toUri();
         mvc.perform(MockMvcRequestBuilders.delete(uri)
                 .contentType(MediaTypes.HAL_JSON))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
-        verify(foodService, times(1)).removeAll();
+        verify(service, times(1)).removeAll();
     }
     
 }

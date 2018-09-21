@@ -16,6 +16,16 @@ public class FoodRequest {
     private LocalDate expiryDate;
     private Fridge fridge;
     
+    public Integer getFridgeId() {
+        return fridge.getId();
+    }
+    public void setFridgeId(Integer fridgeId) {
+        if(fridge == null) {
+            fridge = new Fridge();
+        }
+        fridge.setId(fridgeId);
+    }
+    
     public FoodRequest(Food food) {
         this.id = food.getId();
         this.name = food.getName();

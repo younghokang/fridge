@@ -11,7 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
@@ -28,8 +28,7 @@ public abstract class ControllerBase {
     
     protected static ChromeDriver browser;
     
-    @Value("${local.server.port}")
-    private int port;
+    private @LocalServerPort int port;
     private String host = "http://localhost";
     protected static String BASE_URL;
     
@@ -61,9 +60,10 @@ public abstract class ControllerBase {
     }
     
     protected FridgeCommand createFridge(String nickname, long userId) {
-        FridgeCommand fridgeCommand = new FridgeCommand();
-        fridgeCommand.setNickname(nickname);
-        fridgeCommand.setUserId(userId);
+        FridgeCommand fridgeCommand = FridgeCommand.builder()
+                .nickname(nickname)
+                .userId(userId)
+                .build();
         
         ResponseEntity<FridgeCommand> response = restTemplate.postForEntity(CORE_API_URL + "/fridges", fridgeCommand, FridgeCommand.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);

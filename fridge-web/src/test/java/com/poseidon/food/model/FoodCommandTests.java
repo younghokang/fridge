@@ -16,14 +16,17 @@ public class FoodCommandTests {
         foodCommand.setExpiryDate(LocalDate.now());
         assertThat(foodCommand.showExpiryDDay()).isEqualTo("D-Day");
         
-        foodCommand.setExpiryDate(LocalDate.now().minusDays(3));
+        foodCommand.setExpiryDate(LocalDate.now().plusDays(3));
         assertThat(foodCommand.showExpiryDDay()).isEqualTo("D-3");
         
-        foodCommand.setExpiryDate(LocalDate.now().minusDays(4));
+        foodCommand.setExpiryDate(LocalDate.now().plusDays(4));
         assertThat(foodCommand.showExpiryDDay()).isNull();
         
-        foodCommand.setExpiryDate(LocalDate.now().plusDays(1));
+        foodCommand.setExpiryDate(LocalDate.now().minusDays(1));
         assertThat(foodCommand.showExpiryDDay()).isEqualTo("D+1");
+        
+        foodCommand.setExpiryDate(LocalDate.now().minusDays(5));
+        assertThat(foodCommand.showExpiryDDay()).isEqualTo("D+5");
     }
 
 }

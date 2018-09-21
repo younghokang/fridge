@@ -22,20 +22,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.poseidon.food.model.Food;
 import com.poseidon.food.model.FoodRequest;
-import com.poseidon.food.repository.JpaFoodRepository;
+import com.poseidon.food.repository.FoodRepository;
 import com.poseidon.food.service.FoodService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/foods")
 @RequiredArgsConstructor
-@Slf4j
 public class FoodController {
-    private final JpaFoodRepository repository;
+    private final FoodRepository repository;
     private final FoodService service;
-    private FoodResourceAssembler assembler = new FoodResourceAssembler();
+    private final FoodResourceAssembler assembler;
     
     @GetMapping
     Resources<Resource<Food>> findAllFoods() {
@@ -49,7 +47,8 @@ public class FoodController {
     
     @GetMapping("/{id}")
     Resource<Food> findById(@PathVariable final long id) {
-        Food food = repository.findOne(id);
+        Food food = repository.findById(id)
+                .orElseThrow(() -> new FoodNotFoundException(id));
         return assembler.toResource(food);
     }
     
@@ -63,12 +62,22 @@ public class FoodController {
     
     @PutMapping("/{id}")
     ResponseEntity<?> updateFood(@PathVariable final long id, 
-            @RequestBody final FoodRequest foodRequest) {
-        log.info("foodRequest: " + foodRequest.toString());
-        if(repository.findOne(id) != null) {
-            service.save(foodRequest.toFood());
-        }
-        return ResponseEntity.noContent().build();
+            @RequestBody final FoodRequest foodRequest) throws URISyntaxException {
+        Food updatedFood = repository.findById(id)
+                .map(food -> {
+                    food.setName(foodRequest.getName());
+                    food.setQuantity(foodRequest.getQuantity());
+                    food.setExpiryDate(foodRequest.getExpiryDate());
+                    food.setFridge(foodRequest.getFridge());
+                    return repository.save(food);
+                })
+                .orElseGet(() -> {
+                    foodRequest.setId(id);
+                    return repository.save(foodRequest.toFood());
+                });
+        Resource<Food> resource = assembler.toResource(updatedFood);
+        return ResponseEntity.created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
     
     @DeleteMapping("/{id}")

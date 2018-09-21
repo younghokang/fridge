@@ -15,8 +15,8 @@
       <div class="row">
         <div class="col-md-12">
           <h4 class="mb-3">식품 추가하기</h4>
-          <form class="needs-validation" th:action="@{/fridges/foods/add}" th:object="${foodCommand}" th:method="post" novalidate="novalidate">
-            <input type="hidden" th:field="*{fridge.id}" />
+          <form class="needs-validation" th:action="@{/fridges/{fridgeId}/foods/add(fridgeId=*{fridgeId})}" th:object="${foodCommand}" th:method="post" novalidate="novalidate">
+            <input type="hidden" th:field="*{fridgeId}" />
             <div class="mb-3">
               <label for="name">식품명:</label> 
               <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid" />

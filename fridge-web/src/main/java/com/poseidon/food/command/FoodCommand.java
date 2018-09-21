@@ -11,8 +11,13 @@ import javax.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.poseidon.fridge.command.FridgeCommand;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class FoodCommand {
     
     private Long id;
@@ -27,46 +32,13 @@ public class FoodCommand {
     
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate expiryDate;
-    private FridgeCommand fridge;
+    private Integer fridgeId;
     
     public static final int SHOW_EXPIRY_D_DAYS = -3;
     
-    public FoodCommand() {}
-
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Integer getQuantity() {
-        return quantity;
-    }
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-    public LocalDate getExpiryDate() {
-        return expiryDate;
-    }
-    public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-    public FridgeCommand getFridge() {
-        return fridge;
-    }
-    public void setFridge(FridgeCommand fridge) {
-        this.fridge = fridge;
-    }
-    
     @JsonIgnore
     public int getExpiryDays() {
-        return Period.between(LocalDate.now(), getExpiryDate()).getDays();
+        return Period.between(getExpiryDate(), LocalDate.now()).getDays();
     }
     
     public String showExpiryDDay() {
@@ -81,12 +53,14 @@ public class FoodCommand {
         }
         return null;
     }
-
-    @Override
-    public String toString() {
-        return "FoodCommand [id=" + id + ", name=" + name + ", quantity=" + quantity + ", expiryDate=" + expiryDate
-                + ", fridge=" + fridge + "]";
+    
+    @Builder
+    public FoodCommand(Long id, String name, Integer quantity, LocalDate expiryDate, Integer fridgeId) {
+        this.id = id;
+        this.name = name;
+        this.quantity = quantity;
+        this.expiryDate = expiryDate;
+        this.fridgeId = fridgeId;
     }
-
 
 }

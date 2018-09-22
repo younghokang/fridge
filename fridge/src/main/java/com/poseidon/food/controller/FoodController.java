@@ -76,7 +76,8 @@ public class FoodController {
                     return repository.save(foodRequest.toFood());
                 });
         Resource<Food> resource = assembler.toResource(updatedFood);
-        return ResponseEntity.created(new URI(resource.getId().expand().getHref()))
+        URI uri = new URI(resource.getId().expand().getHref());
+        return ResponseEntity.created(uri)
                 .body(resource);
     }
     

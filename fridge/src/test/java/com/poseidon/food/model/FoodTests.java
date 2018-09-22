@@ -40,7 +40,7 @@ public class FoodTests {
                 .build();
         
         assertThat(food.getExpiryDate()).isNotNull();
-        assertThat(food.getExpiryDate()).isGreaterThan(LocalDate.now());
+        assertThat(food.getExpiryDate()).isAfter(LocalDate.now());
         assertThat(food.getExpiryDate()).isEqualTo(LocalDate.now().plusDays(Food.DEFAULT_EXPIRY_DAYS));
     }
     

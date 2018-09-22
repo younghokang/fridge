@@ -28,7 +28,7 @@ public class FridgeServiceImpl implements FridgeService {
 
     @Override
     public void remove(int id) {
-        repository.delete(id);
+        repository.deleteById(id);
     }
 
     @Override

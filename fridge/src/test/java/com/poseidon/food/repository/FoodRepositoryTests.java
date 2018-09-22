@@ -29,9 +29,10 @@ public class FoodRepositoryTests {
     @Test
     public void save() {
         repository.save(cola);
-        Food food = repository.findOne(cola.getId());
+        Food food = repository.findById(cola.getId())
+                .orElse(null);
         assertThat(food.getName()).isEqualTo(cola.getName());
-        assertThat(food.getExpiryDate()).isEqualByComparingTo(LocalDate.of(2018, 9, 10));
+        assertThat(food.getExpiryDate()).isEqualTo("2018-09-10");
     }
     
     @Test
@@ -39,7 +40,7 @@ public class FoodRepositoryTests {
         repository.save(cola);
         assertThat(repository.findAll().size()).isEqualTo(1);
         
-        repository.delete(cola.getId());
+        repository.deleteById(cola.getId());
         assertThat(repository.findAll().size()).isEqualTo(0);
     }
     
@@ -56,7 +57,7 @@ public class FoodRepositoryTests {
         cola.setQuantity(1);
         repository.flush();
         assertThat(cola.getLastModifiedDate()).isNotEqualTo(cola.getCreatedDate());
-        assertThat(cola.getLastModifiedDate()).isGreaterThan(cola.getCreatedDate());
+        assertThat(cola.getLastModifiedDate()).isAfter(cola.getCreatedDate());
     }
     
 }

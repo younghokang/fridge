@@ -10,5 +10,4 @@ import com.poseidon.fridge.model.Fridge;
 @Repository
 public interface FridgeRepository extends JpaRepository<Fridge, Integer> {
     Optional<Fridge> findByUserId(Long userId);
-    Optional<Fridge> findById(Integer id);
 }

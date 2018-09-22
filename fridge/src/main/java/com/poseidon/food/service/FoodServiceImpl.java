@@ -30,7 +30,7 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public void remove(Long id) {
-        repository.delete(id);
+        repository.deleteById(id);
     }
 
 }

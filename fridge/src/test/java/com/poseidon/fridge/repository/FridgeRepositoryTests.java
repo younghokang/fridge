@@ -37,7 +37,7 @@ public class FridgeRepositoryTests {
     @Test
     public void update() {
         Fridge updatedFridge = repository.save(fridge);
-        assertThat(repository.findOne(updatedFridge.getId())).isNotNull();
+        assertThat(repository.findById(updatedFridge.getId()).isPresent()).isTrue();
         
         Fridge replaceFridge = Fridge.builder()
                 .id(updatedFridge.getId())
@@ -45,17 +45,17 @@ public class FridgeRepositoryTests {
                 .build();
         repository.save(replaceFridge);
         
-        Fridge savedFridge = repository.findOne(replaceFridge.getId());
+        Fridge savedFridge = repository.findById(replaceFridge.getId()).orElse(null);
         assertThat(savedFridge.getNickname()).isEqualTo(replaceFridge.getNickname());
     }
     
     @Test
     public void remove() {
         Fridge newFridge = repository.save(fridge);
-        assertThat(repository.findOne(newFridge.getId())).isNotNull();
+        assertThat(repository.findById(newFridge.getId()).isPresent()).isTrue();
         assertThat(repository.count()).isEqualTo(1L);
         
-        repository.delete(newFridge.getId());
+        repository.deleteById(newFridge.getId());
         assertThat(repository.count()).isZero();
     }
     
@@ -72,7 +72,7 @@ public class FridgeRepositoryTests {
         newFridge.addFood(milk);
         repository.flush();
         
-        Fridge dbFridge = repository.findOne(newFridge.getId());
+        Fridge dbFridge = repository.findById(newFridge.getId()).orElse(null);
         assertThat(dbFridge.getFoods().size()).isEqualTo(1);
         assertThat(dbFridge.getFoods().get(0).getId()).isPositive();
         
@@ -121,7 +121,7 @@ public class FridgeRepositoryTests {
         fridge.setUserId(1004L);
         repository.flush();
         assertThat(fridge.getLastModifiedDate()).isNotEqualTo(fridge.getCreatedDate());
-        assertThat(fridge.getLastModifiedDate()).isGreaterThan(fridge.getCreatedDate());
+        assertThat(fridge.getLastModifiedDate()).isAfter(fridge.getCreatedDate());
     }
     
 }

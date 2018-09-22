@@ -1,11 +1,11 @@
 package com.poseidon.fridge.controller;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,11 +44,8 @@ import com.poseidon.fridge.model.FridgeRequest;
 import com.poseidon.fridge.repository.FridgeRepository;
 import com.poseidon.fridge.service.FridgeService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @RunWith(SpringRunner.class)
 @WebMvcTest(FridgeController.class)
-@Slf4j
 public class FridgeControllerTests {
     
     @Configuration
@@ -153,15 +150,12 @@ public class FridgeControllerTests {
     public void put() throws Exception {
         given(repository.findById(anyInt())).willReturn(Optional.of(fridge));
         given(service.save(any(Fridge.class))).willReturn(fridge);
-        log.info(myFridge.toString());
-        
-        given(assembler.toResource(any(Fridge.class))).willReturn(new Resource<Fridge>(fridge, 
+        given(assembler.toResource(any())).willReturn(new Resource<Fridge>(fridge, 
                 new Link(BASE_PATH + "/fridges/" + fridge.getId()),
                 new Link(BASE_PATH + "/fridges", "fridges")
                 ));
         
-        URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
-        final ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.put(uri)
+        final ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.put("/fridges/{id}", ID)
                 .content(mapper.writeValueAsString(myFridge))
                 .contentType(MediaTypes.HAL_JSON));
         resultAction.andExpect(status().isCreated())
@@ -171,7 +165,7 @@ public class FridgeControllerTests {
     
     @Test
     public void delete() throws Exception {
-        given(repository.findOne(anyInt())).willReturn(fridge);
+        given(repository.findById(anyInt())).willReturn(Optional.of(fridge));
         URI uri = UriComponentsBuilder.fromUriString("/fridges/{id}").buildAndExpand(ID).toUri();
         mvc.perform(MockMvcRequestBuilders.delete(uri)
                 .contentType(MediaTypes.HAL_JSON))

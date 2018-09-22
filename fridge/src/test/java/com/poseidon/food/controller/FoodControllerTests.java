@@ -143,12 +143,11 @@ public class FoodControllerTests {
     public void put() throws Exception {
         given(repository.findById(anyLong())).willReturn(Optional.of(milk));
         given(service.save(any(Food.class))).willReturn(milk);
-        given(assembler.toResource(any(Food.class))).willReturn(new Resource<Food>(milk,
+        given(assembler.toResource(any())).willReturn(new Resource<Food>(milk,
                 new Link(BASE_PATH + "/foods/" + milk.getId()),
                 new Link(BASE_PATH + "/foods", "foods")));
         
-        URI uri = UriComponentsBuilder.fromUriString("/foods/{id}").buildAndExpand(ID).toUri();
-        final ResultActions result = mvc.perform(MockMvcRequestBuilders.put(uri)
+        final ResultActions result = mvc.perform(MockMvcRequestBuilders.put("/foods/{id}", ID)
                 .content(mapper.writeValueAsString(foodRequest))
                 .contentType(MediaTypes.HAL_JSON));
         result.andExpect(status().isCreated())
@@ -158,7 +157,7 @@ public class FoodControllerTests {
     
     @Test
     public void delete() throws Exception {
-        given(repository.findOne(anyLong())).willReturn(milk);
+        given(repository.findById(anyLong())).willReturn(Optional.of(milk));
         URI uri = UriComponentsBuilder.fromUriString("/foods/{id}").buildAndExpand(ID).toUri();
         mvc.perform(MockMvcRequestBuilders.delete(uri)
                 .contentType(MediaTypes.HAL_JSON))

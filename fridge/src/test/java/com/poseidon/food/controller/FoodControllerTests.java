@@ -24,6 +24,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
@@ -42,8 +44,12 @@ import com.poseidon.food.service.FoodService;
 import com.poseidon.fridge.model.Fridge;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(FoodController.class)
+@WebMvcTest(FoodControllerTests.class)
 public class FoodControllerTests {
+    
+    @Configuration
+    @ComponentScan(basePackageClasses = {FoodControllerTests.class})
+    public static class TestConf {}
     
     @Autowired
     private MockMvc mvc;

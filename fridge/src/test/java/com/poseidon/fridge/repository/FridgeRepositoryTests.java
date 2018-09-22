@@ -2,6 +2,8 @@ package com.poseidon.fridge.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,5 +104,24 @@ public class FridgeRepositoryTests {
         
         repository.findByUserId(userId);
     }
-
+    
+    @Test
+    public void whenCreateFridgeAndSaveThenAlreadyExistsCreatedDateAndLastModifiedDate() {
+        Fridge fridge = Fridge.builder()
+                .nickname("myFridge")
+                .build();
+        assertThat(fridge.getCreatedDate()).isNull();
+        
+        repository.save(fridge);
+        assertThat(fridge.getCreatedDate()).isNotNull();
+        assertThat(fridge.getCreatedDate()).isBetween(LocalDateTime.now().minusSeconds(1L), LocalDateTime.now());
+        assertThat(fridge.getLastModifiedDate()).isNotNull();
+        assertThat(fridge.getLastModifiedDate()).isEqualTo(fridge.getCreatedDate());
+        
+        fridge.setUserId(1004L);
+        repository.flush();
+        assertThat(fridge.getLastModifiedDate()).isNotEqualTo(fridge.getCreatedDate());
+        assertThat(fridge.getLastModifiedDate()).isGreaterThan(fridge.getCreatedDate());
+    }
+    
 }

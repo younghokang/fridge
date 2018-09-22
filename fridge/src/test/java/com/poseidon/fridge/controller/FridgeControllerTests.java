@@ -26,6 +26,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
@@ -48,6 +50,10 @@ import lombok.extern.slf4j.Slf4j;
 @WebMvcTest(FridgeController.class)
 @Slf4j
 public class FridgeControllerTests {
+    
+    @Configuration
+    @ComponentScan(basePackageClasses = {FridgeController.class})
+    public static class TestConf {}
     
     @Autowired
     private MockMvc mvc;

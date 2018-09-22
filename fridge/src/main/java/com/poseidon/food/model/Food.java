@@ -1,11 +1,17 @@
 package com.poseidon.food.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.poseidon.fridge.model.Fridge;
@@ -17,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Food {
     private @Id @GeneratedValue Long id;
     private String name;
@@ -26,6 +33,9 @@ public class Food {
     @ManyToOne
     @JsonIgnore
     private Fridge fridge;
+    
+    private @CreatedDate LocalDateTime createdDate;
+    private @LastModifiedDate LocalDateTime lastModifiedDate;
     
     @Builder
     public Food(Long id, String name, int quantity, LocalDate expiryDate, Fridge fridge) {

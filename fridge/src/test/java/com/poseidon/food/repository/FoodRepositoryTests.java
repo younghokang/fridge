@@ -3,6 +3,7 @@ package com.poseidon.food.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,22 @@ public class FoodRepositoryTests {
         
         repository.delete(cola.getId());
         assertThat(repository.findAll().size()).isEqualTo(0);
+    }
+    
+    @Test
+    public void whenCreateFoodAndSaveThenAlreadyExistsCreatedDateAndLastModifiedDate() {
+        assertThat(cola.getCreatedDate()).isNull();
+        repository.save(cola);
+        
+        assertThat(cola.getCreatedDate()).isNotNull();
+        assertThat(cola.getCreatedDate()).isBetween(LocalDateTime.now().minusSeconds(1L), LocalDateTime.now());
+        assertThat(cola.getLastModifiedDate()).isNotNull();
+        assertThat(cola.getLastModifiedDate()).isEqualTo(cola.getCreatedDate());
+        
+        cola.setQuantity(1);
+        repository.flush();
+        assertThat(cola.getLastModifiedDate()).isNotEqualTo(cola.getCreatedDate());
+        assertThat(cola.getLastModifiedDate()).isGreaterThan(cola.getCreatedDate());
     }
     
 }

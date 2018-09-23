@@ -3,9 +3,3 @@ spring:
     name: fridge-ui
 server:
   port: 8080
-fridge-service:
-  ribbon:
-    eureka:
-      enabled: false
-    listOfServers: localhost:8081
-    ServerListRefreshInterval: 15000

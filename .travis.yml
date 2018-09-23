@@ -1,0 +1,12 @@
+language: java
+jdk:
+  - oraclejdk8
+branches:
+  only:
+    - master
+before_script: cd fridge
+script: mvn clean package
+notifications:
+  email:
+    recipients:
+      - younghokang.1121@gmail.com

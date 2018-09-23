@@ -1,0 +1,11 @@
+language: java
+jdk:
+  - oraclejdk8
+branches:
+  only:
+    - master
+script: mvn clean package
+notifications:
+  email:
+    recipients:
+      - younghokang.1121@gmail.com

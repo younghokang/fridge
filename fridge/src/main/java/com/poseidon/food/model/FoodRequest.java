@@ -7,8 +7,8 @@ import com.poseidon.fridge.model.Fridge;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
+@Data
 public class FoodRequest {
     private Long id;
     private String name;

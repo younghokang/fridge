@@ -21,8 +21,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
+@Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Food {

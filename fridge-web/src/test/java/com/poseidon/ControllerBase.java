@@ -35,7 +35,7 @@ public abstract class ControllerBase {
     @Autowired
     protected RestTemplate restTemplate;
     
-    protected static final String CORE_API_URL = "http://localhost:8081";
+    protected static final String CORE_API_URL = "http://fridge-service";
     
     @Before
     public void init() {

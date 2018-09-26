@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: fridge-member
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  h2:
+    console:
+      enabled: true
+server:
+  port: 8082
+logging:
+  level:
+    org:
+      hibernate:
+        type: trace
+        

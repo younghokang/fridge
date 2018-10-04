@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class FoodRestService {
-    private final RestTemplate restTemplate;
+    private final RestTemplate fridgeServiceRestTemplate;
     
     public FoodCommand create(FoodCommand foodCommand) {
-        ResponseEntity<FoodCommand> response = restTemplate.postForEntity("/foods", foodCommand, FoodCommand.class);
+        ResponseEntity<FoodCommand> response = fridgeServiceRestTemplate.postForEntity("/foods", foodCommand, FoodCommand.class);
         if(response.getStatusCode() == HttpStatus.CREATED) {
             return response.getBody();
         }
@@ -27,7 +27,7 @@ public class FoodRestService {
     
     public FoodCommand loadById(long id) {
         try {
-            ResponseEntity<FoodCommand> response = restTemplate.getForEntity("/foods/{id}", FoodCommand.class, id);
+            ResponseEntity<FoodCommand> response = fridgeServiceRestTemplate.getForEntity("/foods/{id}", FoodCommand.class, id);
             if(response.getStatusCode() == HttpStatus.OK) {
                 return response.getBody();
             }
@@ -38,11 +38,11 @@ public class FoodRestService {
     }
     
     public void update(FoodCommand foodCommand, long id) {
-        restTemplate.put("/foods/{id}", foodCommand, id);
+        fridgeServiceRestTemplate.put("/foods/{id}", foodCommand, id);
     }
     
     public void delete(long id) {
-        restTemplate.delete("/foods/{id}", id);
+        fridgeServiceRestTemplate.delete("/foods/{id}", id);
     }
 
 }

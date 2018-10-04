@@ -12,6 +12,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import java.net.URI;
 import java.time.LocalDate;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,10 +37,18 @@ public class FoodRestServiceTests {
     FoodRestService service;
     
     @Autowired
+    private RestTemplate fridgeServiceRestTemplate;
+    
+    @Autowired
     private MockRestServiceServer server;
     
     @Autowired
     private ObjectMapper mapper;
+    
+    @Before
+    public void setUp() {
+        server = MockRestServiceServer.createServer(fridgeServiceRestTemplate);
+    }
     
     private FoodCommand food = FoodCommand.builder()
             .id(1L)
@@ -48,11 +58,13 @@ public class FoodRestServiceTests {
             .fridgeId(1)
             .build();
     
+    private static final String BASE_PATH = "http://fridge-service";
+    
     @Test
     public void create() throws JsonProcessingException {
-        URI location = UriComponentsBuilder.fromUriString("/foods/{id}").buildAndExpand(food.getId()).toUri();
+        URI location = UriComponentsBuilder.fromUriString(BASE_PATH + "/foods/{id}").buildAndExpand(food.getId()).toUri();
         
-        server.expect(requestTo("/foods"))
+        server.expect(requestTo(BASE_PATH + "/foods"))
             .andExpect(method(HttpMethod.POST))
             .andExpect(content().string(mapper.writeValueAsString(food)))
             .andRespond(withCreatedEntity(location).body(mapper.writeValueAsString(food)).contentType(MediaType.APPLICATION_JSON_UTF8));
@@ -65,7 +77,7 @@ public class FoodRestServiceTests {
     
     @Test
     public void loadById() throws JsonProcessingException {
-        server.expect(requestTo("/foods/" + food.getId()))
+        server.expect(requestTo(BASE_PATH + "/foods/" + food.getId()))
             .andExpect(method(HttpMethod.GET))
             .andRespond(withSuccess(mapper.writeValueAsString(food), MediaType.APPLICATION_JSON_UTF8));
         
@@ -77,7 +89,7 @@ public class FoodRestServiceTests {
     
     @Test
     public void whenLoadByIdThenNotFoundHttpStatus() {
-        server.expect(requestTo("/foods/" + food.getId()))
+        server.expect(requestTo(BASE_PATH + "/foods/" + food.getId()))
             .andExpect(method(HttpMethod.GET))
             .andRespond(withStatus(HttpStatus.NOT_FOUND));
         
@@ -88,7 +100,7 @@ public class FoodRestServiceTests {
     
     @Test
     public void update() throws JsonProcessingException {
-        server.expect(requestTo("/foods/" + food.getId()))
+        server.expect(requestTo(BASE_PATH + "/foods/" + food.getId()))
             .andExpect(method(HttpMethod.PUT))
             .andExpect(content().string(mapper.writeValueAsString(food)))
             .andRespond(withNoContent());
@@ -100,7 +112,7 @@ public class FoodRestServiceTests {
     
     @Test
     public void delete() {
-        server.expect(requestTo("/foods/" + food.getId()))
+        server.expect(requestTo(BASE_PATH + "/foods/" + food.getId()))
             .andExpect(method(HttpMethod.DELETE))
             .andRespond(withNoContent());
         

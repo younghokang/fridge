@@ -16,8 +16,14 @@ public class Application {
     
     @LoadBalanced
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    public RestTemplate fridgeServiceRestTemplate(RestTemplateBuilder builder) {
         return builder.rootUri("http://fridge-service").build();
+    }
+    
+    @LoadBalanced
+    @Bean
+    public RestTemplate memberRestTemplate(RestTemplateBuilder builder) {
+        return builder.rootUri("http://fridge-member").build();
     }
     
     @Bean
@@ -28,5 +34,5 @@ public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-    
+
 }

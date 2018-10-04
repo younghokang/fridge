@@ -15,22 +15,21 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class FridgeRestService {
-    private final RestTemplate restTemplate;
+    private final RestTemplate fridgeServiceRestTemplate;
     
     private static final String DEFAULT_NICKNAME = "myFridge";
-    private static final long USER_ID = 1004L;
     
-    public FridgeCommand loadMyFridge() {
-        FridgeCommand fridgeCommand = loadByUserId(USER_ID);
+    public FridgeCommand loadMyFridge(long id) {
+        FridgeCommand fridgeCommand = loadByUserId(id);
         if(fridgeCommand == null) {
-            return generate(DEFAULT_NICKNAME, USER_ID);
+            return generate(DEFAULT_NICKNAME, id);
         }
         return fridgeCommand;
     }
     
-    FridgeCommand loadByUserId(long userId) {
+    FridgeCommand loadByUserId(long id) {
         try {
-            ResponseEntity<FridgeCommand> response = restTemplate.getForEntity("/fridges/me/" + USER_ID, FridgeCommand.class);
+            ResponseEntity<FridgeCommand> response = fridgeServiceRestTemplate.getForEntity("/fridges/me/" + id, FridgeCommand.class);
             if(response.getStatusCode() == HttpStatus.OK) {
                 return response.getBody();
             }
@@ -40,12 +39,12 @@ public class FridgeRestService {
         return null;
     }
     
-    FridgeCommand generate(String nickname, long userId) {
+    FridgeCommand generate(String nickname, long id) {
         FridgeCommand fridgeCommand = new FridgeCommand();
         fridgeCommand.setNickname(nickname);
-        fridgeCommand.setUserId(userId);
+        fridgeCommand.setUserId(id);
         
-        ResponseEntity<FridgeCommand> response = restTemplate.postForEntity("/fridges", fridgeCommand, FridgeCommand.class);
+        ResponseEntity<FridgeCommand> response = fridgeServiceRestTemplate.postForEntity("/fridges", fridgeCommand, FridgeCommand.class);
         if(response.getStatusCode() == HttpStatus.CREATED) {
             return response.getBody();
         }

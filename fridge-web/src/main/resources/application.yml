@@ -2,4 +2,7 @@ spring:
   application:
     name: fridge-ui
 server:
-  port: 8080
+  port: 8083
+logging:
+  level:
+    org.springframework.security: DEBUG

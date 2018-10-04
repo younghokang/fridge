@@ -1,9 +1,10 @@
 package com.poseidon.fridge.member.controller;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,12 +19,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseidon.fridge.member.model.Member;
 import com.poseidon.fridge.member.repository.MemberRepository;
+import com.poseidon.fridge.member.service.MemberService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(MemberController.class)
@@ -37,6 +42,12 @@ public class MemberControllerTests {
     
     @MockBean
     private MemberResourceAssembler assembler;
+    
+    @MockBean
+    private MemberService service;
+    
+    @Autowired
+    private ObjectMapper mapper;
     
     private Member member;
     
@@ -72,6 +83,19 @@ public class MemberControllerTests {
         mvc.perform(get("/members/{username}", member.getUsername()))
             .andExpect(status().isNotFound())
             .andExpect(content().string("could not found username by " + member.getUsername()));
+    }
+    
+    @Test
+    public void registerNewMember() throws JsonProcessingException, Exception {
+        when(service.save(any(Member.class))).thenReturn(member);
+        when(assembler.toResource(any(Member.class))).thenReturn(new Resource<Member>(member,
+                new Link(BASE_PATH + "/members/" + member.getId(), "self")));
+        
+        final ResultActions resultAction = mvc.perform(post("/members")
+                .content(mapper.writeValueAsString(member))
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isCreated());
+        verifyResultActions(resultAction);
     }
     
 }

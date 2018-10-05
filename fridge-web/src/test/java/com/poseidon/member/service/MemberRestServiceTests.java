@@ -5,6 +5,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withCreatedEntity;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.io.IOException;
@@ -88,6 +89,32 @@ public class MemberRestServiceTests {
         
         server.verify();
         assertThat(member).isEqualToComparingFieldByField(memberRequest.toMember());
+    }
+    
+    @Test
+    public void changePassword() throws JsonProcessingException {
+        URI location = UriComponentsBuilder.fromUriString(BASE_PATH + "/members/{id}").buildAndExpand(1).toUri();
+        server.expect(requestTo(BASE_PATH + "/members/" + memberRequest.getId()))
+            .andExpect(method(HttpMethod.PUT))
+            .andExpect(content().string(mapper.writeValueAsString(memberRequest)))
+            .andRespond(withCreatedEntity(location)
+                    .body(mapper.writeValueAsString(memberRequest))
+                    .contentType(MediaType.APPLICATION_JSON_UTF8));
+        
+        service.changePassword(memberRequest);
+        
+        server.verify();
+    }
+    
+    @Test
+    public void withdraw() {
+        server.expect(requestTo(BASE_PATH + "/members/" + memberRequest.getId()))
+            .andExpect(method(HttpMethod.DELETE))
+            .andRespond(withNoContent().contentType(MediaType.APPLICATION_JSON_UTF8));
+        
+        service.withdraw(memberRequest.getId());
+        
+        server.verify();
     }
 
 }

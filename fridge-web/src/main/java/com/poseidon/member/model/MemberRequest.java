@@ -3,24 +3,25 @@ package com.poseidon.member.model;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Data
 public class MemberRequest {
     private Long id;
-    @NotNull
     @Size(min=6, max=128)
     private String username;
-    @NotNull
-    @Size(max=72)
+    @Size(min=8, max=72)
     private String password;
+    @JsonIgnore
+    private String currentPassword;
     private Set<String> authorities;
     private boolean accountNonExpired;
     private boolean accountNonLocked;

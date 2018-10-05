@@ -37,5 +37,13 @@ public class MemberRestService {
         }
         return null;
     }
+    
+    public void changePassword(MemberRequest memberRequest) {
+        memberRestTemplate.put("/members/{id}", memberRequest, memberRequest.getId());
+    }
+    
+    public void withdraw(long id) {
+        memberRestTemplate.delete("/members/{id}", id);
+    }
 
 }

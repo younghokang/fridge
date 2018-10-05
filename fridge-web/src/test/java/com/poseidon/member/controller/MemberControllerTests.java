@@ -51,5 +51,5 @@ public class MemberControllerTests {
         mockMvc.perform(get("/fridges/1/foods/add"))
             .andExpect(status().isOk());
     }
-
+    
 }

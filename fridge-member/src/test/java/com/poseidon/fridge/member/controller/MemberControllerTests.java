@@ -1,14 +1,19 @@
 package com.poseidon.fridge.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URI;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -18,11 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -96,6 +104,33 @@ public class MemberControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isCreated());
         verifyResultActions(resultAction);
+    }
+    
+    @Test
+    public void changePassword() throws Exception {
+        given(repository.findById(anyLong())).willReturn(Optional.of(member));
+        given(service.save(any(Member.class))).willReturn(member);
+        given(assembler.toResource(any())).willReturn(new Resource<Member>(member, 
+                new Link(BASE_PATH + "/members/" + member.getId()),
+                new Link(BASE_PATH + "/members", "members")
+                ));
+        
+        final ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.put("/members/{id}", member.getId())
+                .content(mapper.writeValueAsString(member))
+                .contentType(MediaTypes.HAL_JSON));
+        resultAction.andExpect(status().isCreated())
+            .andExpect(redirectedUrlPattern("**/members/{id:\\d+}"));
+        verifyResultActions(resultAction);
+    }
+    
+    @Test
+    public void withdraw() throws Exception {
+        doNothing().when(service).withdraw(anyLong());
+        URI uri = UriComponentsBuilder.fromUriString("/members/{id}").buildAndExpand(member.getId()).toUri();
+        mvc.perform(MockMvcRequestBuilders.delete(uri)
+                .contentType(MediaTypes.HAL_JSON))
+            .andExpect(status().isNoContent())
+            .andExpect(content().string(""));
     }
     
 }

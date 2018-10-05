@@ -19,4 +19,8 @@ public class MemberService {
         return repository.save(member);
     }
 
+    public void withdraw(long id) {
+        repository.deleteById(id);
+    }
+
 }

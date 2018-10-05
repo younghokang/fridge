@@ -1,46 +1,69 @@
 package com.poseidon.member.model;
 
 import java.util.Collection;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.Data;
+import lombok.Builder;
 
-@Data
 public class Member implements UserDetails {
     private static final long serialVersionUID = 1L;
     private Long id;
-    @NotNull
-    @Size(min=6, max=128)
     private String username;
-    @NotNull
-    @Size(max=72)
     private String password;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
+    private Set<GrantedAuthority> authorities;
+    
+    @Builder
+    public Member(Long id, String username, String password, boolean accountNonExpired, boolean accountNonLocked,
+            boolean credentialsNonExpired, boolean enabled, Set<GrantedAuthority> authorities) {
+        super();
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.accountNonExpired = accountNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.enabled = enabled;
+        this.authorities = authorities;
+    }
+
+    public Long getId() {
+        return id;
+    }
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return AuthorityUtils.createAuthorityList("USER");
+        return authorities;
+    }
+    @Override
+    public String getPassword() {
+        return password;
+    }
+    @Override
+    public String getUsername() {
+        return username;
     }
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return accountNonExpired;
     }
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return credentialsNonExpired;
     }
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
 }

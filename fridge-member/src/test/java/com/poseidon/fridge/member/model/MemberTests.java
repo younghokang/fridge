@@ -11,9 +11,13 @@ public class MemberTests {
     @Test
     public void newMemberConstructor() {
         Member member = new Member("user", "password");
-        assertThat(member.toString()).isEqualTo("Member(id=" + member.getId()
-            + ", username=" + member.getUsername()
-            + ", password=" + member.getPassword() + ")");
+        assertThat(member.getUsername()).isEqualTo("user");
+        assertThat(member.getPassword()).isEqualTo("password");
+        assertThat(member.isAccountNonExpired()).isTrue();
+        assertThat(member.isAccountNonLocked()).isTrue();
+        assertThat(member.isCredentialsNonExpired()).isTrue();
+        assertThat(member.isEnabled()).isTrue();
+        assertThat(member.getAuthorities()).isEmpty();
     }
 
 }

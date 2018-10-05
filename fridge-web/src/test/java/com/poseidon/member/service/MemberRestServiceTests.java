@@ -9,6 +9,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poseidon.member.model.Member;
+import com.poseidon.member.model.MemberRequest;
 
 @RunWith(SpringRunner.class)
 @RestClientTest(MemberRestService.class)
@@ -42,17 +45,21 @@ public class MemberRestServiceTests {
     @Autowired
     private ObjectMapper mapper;
     
-    private Member memberRequest;
+    private MemberRequest memberRequest;
     
     private static final String BASE_PATH = "http://fridge-member";
     
     @Before
     public void setUp() {
         server = MockRestServiceServer.createServer(memberRestTemplate);
-        memberRequest = new Member();
+        memberRequest = new MemberRequest();
         memberRequest.setId(1L);
         memberRequest.setUsername("user");
         memberRequest.setPassword("password");
+        
+        Set<String> authorities = new HashSet<>();
+        authorities.add("ROLE_USER");
+        memberRequest.setAuthorities(authorities);
     }
     
     @Test
@@ -64,7 +71,7 @@ public class MemberRestServiceTests {
         Member member = service.loadByUsername(memberRequest.getUsername());
         
         server.verify();
-        assertThat(member).isEqualToComparingFieldByField(memberRequest);
+        assertThat(member).isEqualToComparingFieldByField(memberRequest.toMember());
     }
     
     @Test
@@ -80,7 +87,7 @@ public class MemberRestServiceTests {
         Member member = service.register(memberRequest);
         
         server.verify();
-        assertThat(member).isEqualToComparingFieldByField(memberRequest);
+        assertThat(member).isEqualToComparingFieldByField(memberRequest.toMember());
     }
 
 }

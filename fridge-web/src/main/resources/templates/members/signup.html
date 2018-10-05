@@ -15,7 +15,7 @@
     <title>Sign up</title>
 </head>
 <body class="text-center">
-    <form class="form-signin" th:action="@{/signup}" th:object="${member}" th:method="POST">
+    <form class="form-signin" th:action="@{/signup}" th:object="${memberRequest}" th:method="POST">
       <h1 class="h3 mb-3 font-weight-normal">회원가입</h1>
       <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('all')}" th:errors="*{all}">Incorrect data</div>
       <label for="username" class="sr-only">이메일</label>

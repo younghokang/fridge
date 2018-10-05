@@ -7,6 +7,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.poseidon.member.model.Member;
+import com.poseidon.member.model.MemberRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,9 @@ public class MemberRestService {
     
     public Member loadByUsername(String username) {
         try {
-            ResponseEntity<Member> response = memberRestTemplate.getForEntity("/members/{username}", Member.class, username);
+            ResponseEntity<MemberRequest> response = memberRestTemplate.getForEntity("/members/{username}", MemberRequest.class, username);
             if(response.getStatusCode() == HttpStatus.OK) {
-                return response.getBody();
+                return response.getBody().toMember();
             }
         } catch(HttpClientErrorException ex) {
             log.error("Response error: {} {}", ex.getStatusCode(), ex.getStatusText());
@@ -29,10 +30,10 @@ public class MemberRestService {
         return null;
     }
     
-    public Member register(Member member) {
-        ResponseEntity<Member> response = memberRestTemplate.postForEntity("/members", member, Member.class);
+    public Member register(MemberRequest memberRequest) {
+        ResponseEntity<MemberRequest> response = memberRestTemplate.postForEntity("/members", memberRequest, MemberRequest.class);
         if(response.getStatusCode() == HttpStatus.CREATED) {
-            return response.getBody();
+            return response.getBody().toMember();
         }
         return null;
     }

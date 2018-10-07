@@ -1,112 +1,146 @@
 package com.poseidon.food.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.assertj.core.api.Condition;
+import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.WebApplicationContext;
 
-import com.poseidon.ControllerBase;
 import com.poseidon.food.command.FoodCommand;
 import com.poseidon.fridge.command.FridgeCommand;
+import com.poseidon.fridge.service.FridgeClient;
+import com.poseidon.member.model.Member;
+import com.poseidon.member.model.MemberRequest;
 
-public class FoodControllerTests extends ControllerBase {
-    private FridgeCommand fridge;
-    private FoodCommand food;
+@RunWith(SpringRunner.class)
+@WebMvcTest(controllers=FoodController.class)
+public class FoodControllerTests {
+    private MockMvc mockMvc;
     
-    @Override
-    protected void setUp() {
-        fridge = createFridge("나의 냉장고", 1004L);
-        FoodCommand foodCommand = FoodCommand.builder()
-                .name("파스퇴르 우유 1.8L")
-                .quantity(1)
-                .fridgeId(fridge.getId())
-                .build();
-        food = createFood(foodCommand);
+    @Autowired
+    private WebApplicationContext context;
+    
+    @MockBean
+    private FridgeClient fridgeClient;
+    
+    private FridgeCommand fridge = FridgeCommand.builder()
+            .id(1)
+            .nickname("myFridge")
+            .userId(1004L)
+            .build();
+    
+    private FoodCommand food = FoodCommand.builder()
+            .id(1L)
+            .name("Banana")
+            .quantity(12)
+            .expiryDate(LocalDate.now())
+            .fridgeId(fridge.getId())
+            .build();
+    
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        
+        MemberRequest memberRequest = new MemberRequest();
+        memberRequest.setId(1004L);
+        memberRequest.setUsername("user@example.com");
+        memberRequest.setPassword("password");
+        memberRequest.generateNewUser(new BCryptPasswordEncoder());
+        
+        Member member = memberRequest.toMember();
+        TestingAuthenticationToken token = new TestingAuthenticationToken(member, null);
+        SecurityContextHolder.getContext().setAuthentication(token);
     }
     
     @Test
-    public void fillInFoodRegisterFormAndSubmit() {
-        assertThat(food.getId()).isPositive();
+    public void whenRegisterFoodSuccessThenRedirect() throws Exception {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("fridgeId", food.getFridgeId().toString());
+        params.add("name", food.getName());
+        params.add("quantity", food.getQuantity().toString());
         
-        browser.get(UriComponentsBuilder
-                .fromHttpUrl(BASE_URL + "/fridges/{fridgeId}/foods/add")
-                .buildAndExpand(fridge.getId())
-                .toString());
+        Map<String, Object> sessionAttributes = new HashMap<>();
+        sessionAttributes.put("foodCommand", food);
         
-        WebElement nameElement = browser.findElement(By.name("name"));
-        WebElement quantityElement = browser.findElement(By.name("quantity"));
-        WebElement expiryDateElement = browser.findElement(By.name("expiryDate"));
-        nameElement.sendKeys(food.getName());
-        quantityElement.sendKeys(Integer.toString(food.getQuantity()));
-        expiryDateElement.sendKeys(food.getExpiryDate().format(DateTimeFormatter.ofPattern("yyyy")));
-        expiryDateElement.sendKeys(Keys.TAB);
-        expiryDateElement.sendKeys(food.getExpiryDate().format(DateTimeFormatter.ofPattern("MMdd")));
-        browser.findElementByTagName("form").submit();
+        when(fridgeClient.createFood(any(FoodCommand.class))).thenReturn(food);
         
-        WebElement alertElement = browser.findElement(By.cssSelector("div.alert"));
-        WebDriverWait wait = new WebDriverWait(browser, 10);
-        wait.until(ExpectedConditions.visibilityOf(alertElement));
-        
-        assertThat(alertElement.getText()).isEqualTo("식품을 저장했습니다.");
+        mockMvc.perform(post("/fridges/{fridgeId}/foods/add", fridge.getId())
+                .sessionAttrs(sessionAttributes)
+                .params(params))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/fridges/me"))
+            .andDo(print());
     }
     
     @Test
-    public void clickAnchorTagFromFood() {
-        Long id = food.getId();
-        
-        browser.get(BASE_URL + "/fridges/me");
-        
-        String viewPageUrl = BASE_URL + "/fridges/" + fridge.getId() + "/foods/" + id;
-        
-        List<WebElement> anchors = browser.findElementsByLinkText(food.getName());
-        assertThat(anchors).filteredOn(new Condition<WebElement>() {
-            @Override
-            public boolean matches(WebElement element) {
-                return element.getAttribute("href").equals(viewPageUrl);
-            }
-        });
-        
-        WebElement anchorTag = anchors.stream()
-                .filter(element -> element.getAttribute("href").equals(viewPageUrl))
-                .findAny()
-                .orElse(null);
-        
-        anchorTag.click();
-        
-        assertThat(browser.getCurrentUrl()).isEqualTo(viewPageUrl);
+    public void whenLoadFoodUpdateFormPageThenExistsModelData() throws Exception {
+        when(fridgeClient.loadFoodById(anyLong())).thenReturn(food);
+        mockMvc.perform(get("/fridges/{fridgeId}/foods/{id}", fridge.getId(), food.getId()))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute("foodCommand", food))
+            .andExpect(view().name("foods/updateFoodForm"))
+            .andDo(print());
     }
     
     @Test
-    public void changeFoodNameAndSubmit() {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(BASE_URL + "/fridges/{fridgeId}/foods/{id}")
-                .buildAndExpand(fridge.getId(), food.getId())
-                .toString();
-        browser.get(url);
+    public void whenUpdateFoodSuccessThenRedirect() throws Exception {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("fridgeId", food.getFridgeId().toString());
+        params.add("name", food.getName());
+        params.add("quantity", food.getQuantity().toString());
         
-        String changeName = "코카콜라 500mL";
-        WebElement nameElement = browser.findElement(By.name("name"));
-        nameElement.clear();
-        nameElement.sendKeys(changeName);
-        browser.findElementByTagName("form").submit();
+        Map<String, Object> sessionAttributes = new HashMap<>();
+        sessionAttributes.put("foodCommand", food);
         
-        WebElement alertElement = browser.findElement(By.cssSelector("div.alert"));
-        WebDriverWait wait = new WebDriverWait(browser, 10);
-        wait.until(ExpectedConditions.visibilityOf(alertElement));
+        when(fridgeClient.updateFood(anyLong(), any(FoodCommand.class))).thenReturn(food);
         
-        assertThat(alertElement.getText()).isEqualTo("식품을 저장했습니다.");
+        mockMvc.perform(put("/fridges/{fridgeId}/foods/{id}", fridge.getId(), food.getId())
+                .sessionAttrs(sessionAttributes)
+                .params(params))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/fridges/me"))
+            .andDo(print());
+    }
+    
+    @Test
+    public void whenDeleteFoodSuccessThenRedirect() throws Exception {
+        doNothing().when(fridgeClient).deleteFood(anyLong());
         
-        browser.get(url);
-        assertThat(browser.findElement(By.name("name")).getAttribute("value")).isEqualTo(changeName);
+        mockMvc.perform(get("/fridges/{fridgeId}/foods/delete/{id}", fridge.getId(), food.getId()))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/fridges/me"))
+            .andDo(print());
+        
+        verify(fridgeClient, times(1)).deleteFood(food.getId());
     }
     
 }

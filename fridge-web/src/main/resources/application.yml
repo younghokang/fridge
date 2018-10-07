@@ -6,3 +6,10 @@ server:
 logging:
   level:
     org.springframework.security: DEBUG
+feign:
+  client:
+    config:
+      fridge-member:
+        errorDecoder: com.poseidon.config.MemberFeignErrorDecoder
+      fridge-service:
+        errorDecoder: com.poseidon.config.FridgeFeignErrorDecoder

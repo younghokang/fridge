@@ -5,22 +5,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import com.poseidon.member.model.Member;
-
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class MemberUserDetailsService implements UserDetailsService {
-    private final MemberRestService service;
+    private final MemberClient client;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = service.loadByUsername(username);
-        if(member == null) {
+        try {
+            return client.loadByUsername(username).toMember();
+        } catch(MemberNotFoundException ex) {
             throw new UsernameNotFoundException("could not found user by username: " + username);
         }
-        return member;
     }
 
 }

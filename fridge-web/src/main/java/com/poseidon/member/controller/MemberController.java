@@ -15,15 +15,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poseidon.member.model.Member;
 import com.poseidon.member.model.MemberRequest;
-import com.poseidon.member.service.MemberRestService;
+import com.poseidon.member.service.MemberClient;
+import com.poseidon.member.service.MemberNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
-    private final MemberRestService service;
     private final PasswordEncoder passwordEncoder;
+    private final MemberClient client;
     
     @GetMapping("/signup")
     public String signupForm(MemberRequest memberRequest, Model model) {
@@ -36,14 +39,21 @@ public class MemberController {
         if(errors.hasErrors()) {
             return "members/signup";
         }
-        Member existsMember = service.loadByUsername(memberRequest.getUsername());
+        
+        MemberRequest existsMember = null;
+        try {
+            existsMember = client.loadByUsername(memberRequest.getUsername());
+        } catch(MemberNotFoundException ex) {
+            log.info(ex.getMessage());
+        }
+        
         if(existsMember != null) {
             errors.rejectValue("username", "field.exists.member.username");
             return "members/signup";
         }
         
         memberRequest.generateNewUser(passwordEncoder);
-        service.register(memberRequest);
+        client.register(memberRequest);
         return "redirect:/signin";
     }
     
@@ -72,7 +82,9 @@ public class MemberController {
             errors.rejectValue("currentPassword", "field.not_same.member.password");
             return "members/changePassword";
         }
-        service.changePassword(memberRequest);
+        
+        memberRequest.setPassword(passwordEncoder.encode(memberRequest.getPassword()));
+        client.changePassword(member.getId(), memberRequest);
         
         redirectAttributes.addFlashAttribute("changePasswordDone", true);
         return "redirect:/changePassword";
@@ -95,7 +107,7 @@ public class MemberController {
             return "members/withdraw";
         }
         
-        service.withdraw(member.getId());
+        client.withdraw(member.getId());
         SecurityContextHolder.clearContext();
         return "members/withdrawDone";
     }

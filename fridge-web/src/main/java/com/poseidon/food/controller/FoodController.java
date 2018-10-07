@@ -16,7 +16,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poseidon.food.command.FoodCommand;
-import com.poseidon.food.service.FoodRestService;
+import com.poseidon.fridge.service.FridgeClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @SessionAttributes("foodCommand")
 @RequiredArgsConstructor
 public class FoodController {
-    private final FoodRestService service;
+    private final FridgeClient client;
     
     @GetMapping("/add")
     public String registerFoodForm(FoodCommand foodCommand, Model model) {
@@ -42,7 +42,7 @@ public class FoodController {
             return "foods/registerFoodForm";
         }
         
-        if(service.create(foodCommand) != null) {
+        if(client.createFood(foodCommand) != null) {
             ra.addFlashAttribute("message", "식품을 저장했습니다.");
             sessionStatus.setComplete();
         }
@@ -52,7 +52,7 @@ public class FoodController {
     @GetMapping("/{id}")
     public String updateFoodForm(@PathVariable("fridgeId") Integer fridgeId, 
             @PathVariable long id, Model model) {
-        FoodCommand foodCommand = service.loadById(id);
+        FoodCommand foodCommand = client.loadFoodById(id);
         foodCommand.setFridgeId(fridgeId);
         model.addAttribute("foodCommand", foodCommand);
         return "foods/updateFoodForm";
@@ -68,7 +68,7 @@ public class FoodController {
             return "foods/updateFoodForm";
         }
         
-        service.update(foodCommand, id);
+        client.updateFood(id, foodCommand);
         ra.addFlashAttribute("message", "식품을 저장했습니다.");
         sessionStatus.setComplete();
         return "redirect:/fridges/me";
@@ -76,7 +76,7 @@ public class FoodController {
     
     @GetMapping("/delete/{id}")
     public String deleteFood(@PathVariable long id, RedirectAttributes ra) {
-        service.delete(id);
+        client.deleteFood(id);
         ra.addFlashAttribute("message", "식품을 삭제했습니다.");
         return "redirect:/fridges/me";
     }

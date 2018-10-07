@@ -11,8 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
 public class MemberRequest {
     private Long id;
@@ -27,6 +30,12 @@ public class MemberRequest {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
+    
+    @Builder
+    public MemberRequest(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
     public Member toMember() {
         return Member.builder()

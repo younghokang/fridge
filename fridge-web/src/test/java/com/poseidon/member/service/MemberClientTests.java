@@ -73,9 +73,9 @@ public class MemberClientTests {
     
     @Test
     public void withdraw() {
-        willDoNothing().given(client).withdraw(anyLong());
-        client.withdraw(memberRequest.getId());
-        verify(client, times(1)).withdraw(anyLong());
+        willDoNothing().given(client).withdraw(anyString());
+        client.withdraw(memberRequest.getUsername());
+        verify(client, times(1)).withdraw(anyString());
     }
     
 

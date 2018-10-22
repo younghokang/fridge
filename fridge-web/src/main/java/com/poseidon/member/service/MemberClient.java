@@ -23,7 +23,7 @@ public interface MemberClient {
     @PutMapping("/{id}")
     MemberRequest changePassword(@PathVariable("id") long id, MemberRequest memberRequest);
     
-    @DeleteMapping("/{id}")
-    void withdraw(@PathVariable("id") long id);
+    @DeleteMapping("/{username}")
+    void withdraw(@PathVariable("username") String username);
     
 }

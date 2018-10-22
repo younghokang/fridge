@@ -107,7 +107,7 @@ public class MemberController {
             return "members/withdraw";
         }
         
-        client.withdraw(member.getId());
+        client.withdraw(member.getUsername());
         SecurityContextHolder.clearContext();
         return "members/withdrawDone";
     }

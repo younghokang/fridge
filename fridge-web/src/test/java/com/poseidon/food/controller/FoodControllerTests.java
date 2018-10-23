@@ -35,8 +35,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.poseidon.food.command.FoodCommand;
-import com.poseidon.fridge.command.FridgeCommand;
+import com.poseidon.food.command.Food;
+import com.poseidon.fridge.command.Fridge;
 import com.poseidon.fridge.service.FridgeClient;
 import com.poseidon.member.model.Member;
 import com.poseidon.member.model.MemberRequest;
@@ -52,13 +52,13 @@ public class FoodControllerTests {
     @MockBean
     private FridgeClient fridgeClient;
     
-    private FridgeCommand fridge = FridgeCommand.builder()
+    private Fridge fridge = Fridge.builder()
             .id(1)
             .nickname("myFridge")
             .userId(1004L)
             .build();
     
-    private FoodCommand food = FoodCommand.builder()
+    private Food food = Food.builder()
             .id(1L)
             .name("Banana")
             .quantity(12)
@@ -89,9 +89,9 @@ public class FoodControllerTests {
         params.add("quantity", food.getQuantity().toString());
         
         Map<String, Object> sessionAttributes = new HashMap<>();
-        sessionAttributes.put("foodCommand", food);
+        sessionAttributes.put("food", food);
         
-        when(fridgeClient.createFood(any(FoodCommand.class))).thenReturn(food);
+        when(fridgeClient.createFood(any(Food.class))).thenReturn(food);
         
         mockMvc.perform(post("/fridges/{fridgeId}/foods/add", fridge.getId())
                 .sessionAttrs(sessionAttributes)
@@ -106,7 +106,7 @@ public class FoodControllerTests {
         when(fridgeClient.loadFoodById(anyLong())).thenReturn(food);
         mockMvc.perform(get("/fridges/{fridgeId}/foods/{id}", fridge.getId(), food.getId()))
             .andExpect(status().isOk())
-            .andExpect(model().attribute("foodCommand", food))
+            .andExpect(model().attribute("food", food))
             .andExpect(view().name("foods/updateFoodForm"))
             .andDo(print());
     }
@@ -119,9 +119,9 @@ public class FoodControllerTests {
         params.add("quantity", food.getQuantity().toString());
         
         Map<String, Object> sessionAttributes = new HashMap<>();
-        sessionAttributes.put("foodCommand", food);
+        sessionAttributes.put("food", food);
         
-        when(fridgeClient.updateFood(anyLong(), any(FoodCommand.class))).thenReturn(food);
+        when(fridgeClient.updateFood(anyLong(), any(Food.class))).thenReturn(food);
         
         mockMvc.perform(put("/fridges/{fridgeId}/foods/{id}", fridge.getId(), food.getId())
                 .sessionAttrs(sessionAttributes)

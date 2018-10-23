@@ -15,26 +15,26 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.poseidon.food.command.FoodCommand;
+import com.poseidon.food.command.Food;
 import com.poseidon.fridge.service.FridgeClient;
 
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/fridges/{fridgeId}/foods")
-@SessionAttributes("foodCommand")
+@SessionAttributes("food")
 @RequiredArgsConstructor
 public class FoodController {
     private final FridgeClient client;
     
     @GetMapping("/add")
-    public String registerFoodForm(FoodCommand foodCommand, Model model) {
-        model.addAttribute("foodCommand", foodCommand);
+    public String registerFoodForm(Food food, Model model) {
+        model.addAttribute("food", food);
         return "foods/registerFoodForm";
     }
     
     @PostMapping("/add")
-    public String processRegistrationFood(@ModelAttribute @Valid FoodCommand foodCommand, 
+    public String processRegistrationFood(@ModelAttribute @Valid Food food, 
             Errors errors, 
             RedirectAttributes ra, 
             SessionStatus sessionStatus) {
@@ -42,7 +42,11 @@ public class FoodController {
             return "foods/registerFoodForm";
         }
         
-        if(client.createFood(foodCommand) != null) {
+        if(food.getExpiryDate() == null) {
+            food.setDefaultExpiryDate();
+        }
+        
+        if(client.createFood(food) != null) {
             ra.addFlashAttribute("message", "식품을 저장했습니다.");
             sessionStatus.setComplete();
         }
@@ -52,15 +56,15 @@ public class FoodController {
     @GetMapping("/{id}")
     public String updateFoodForm(@PathVariable("fridgeId") Integer fridgeId, 
             @PathVariable long id, Model model) {
-        FoodCommand foodCommand = client.loadFoodById(id);
-        foodCommand.setFridgeId(fridgeId);
-        model.addAttribute("foodCommand", foodCommand);
+        Food food = client.loadFoodById(id);
+        food.setFridgeId(fridgeId);
+        model.addAttribute("food", food);
         return "foods/updateFoodForm";
     }
     
     @PutMapping("/{id}")
     public String processUpdateFood(@PathVariable long id, 
-            @ModelAttribute @Valid FoodCommand foodCommand, 
+            @ModelAttribute @Valid Food food, 
             Errors errors, 
             RedirectAttributes ra,
             SessionStatus sessionStatus) {
@@ -68,7 +72,7 @@ public class FoodController {
             return "foods/updateFoodForm";
         }
         
-        client.updateFood(id, foodCommand);
+        client.updateFood(id, food);
         ra.addFlashAttribute("message", "식품을 저장했습니다.");
         sessionStatus.setComplete();
         return "redirect:/fridges/me";

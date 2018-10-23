@@ -6,13 +6,13 @@ import java.time.LocalDate;
 
 import org.junit.Test;
 
-import com.poseidon.food.command.FoodCommand;
+import com.poseidon.food.command.Food;
 
 public class FoodCommandTests {
     
     @Test
     public void showExpiryDDay() {
-        FoodCommand foodCommand = new FoodCommand();
+        Food foodCommand = new Food();
         foodCommand.setExpiryDate(LocalDate.now());
         assertThat(foodCommand.showExpiryDDay()).isEqualTo("D-Day");
         

@@ -17,17 +17,17 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.poseidon.food.command.FoodCommand;
-import com.poseidon.fridge.command.FridgeCommand;
+import com.poseidon.food.command.Food;
+import com.poseidon.fridge.command.Fridge;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment=WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment=WebEnvironment.MOCK, properties= {"eureka.client.enabled:false"})
 public class FridgeClientTests {
     
     @MockBean
     FridgeClient client;
     
-    private FridgeCommand fridgeCommand = FridgeCommand.builder()
+    private Fridge fridgeCommand = Fridge.builder()
             .id(1)
             .nickname("myFridge")
             .userId(1004L)
@@ -36,7 +36,7 @@ public class FridgeClientTests {
     @Test
     public void loadByUserId() {
         when(client.loadByUserId(anyLong())).thenReturn(fridgeCommand);
-        FridgeCommand fridge = client.loadByUserId(fridgeCommand.getUserId());
+        Fridge fridge = client.loadByUserId(fridgeCommand.getUserId());
         assertThat(fridge).isEqualToComparingFieldByField(fridgeCommand);
     }
     
@@ -48,8 +48,8 @@ public class FridgeClientTests {
     
     @Test
     public void generate() {
-        when(client.generate(any(FridgeCommand.class))).thenReturn(fridgeCommand);
-        FridgeCommand fridge = client.generate(fridgeCommand);
+        when(client.generate(any(Fridge.class))).thenReturn(fridgeCommand);
+        Fridge fridge = client.generate(fridgeCommand);
         assertThat(fridge).isEqualToComparingFieldByField(fridgeCommand);
     }
     
@@ -60,7 +60,7 @@ public class FridgeClientTests {
         verify(client, times(1)).deleteAll();
     }
     
-    private FoodCommand food = FoodCommand.builder()
+    private Food food = Food.builder()
             .id(1L)
             .name("Banana Cake")
             .quantity(3)
@@ -70,15 +70,15 @@ public class FridgeClientTests {
     
     @Test
     public void createFood() {
-        when(client.createFood(any(FoodCommand.class))).thenReturn(food);
-        FoodCommand newFood = client.createFood(food);
+        when(client.createFood(any(Food.class))).thenReturn(food);
+        Food newFood = client.createFood(food);
         assertThat(newFood).isEqualToComparingFieldByFieldRecursively(food);
     }
     
     @Test
     public void loadFoodById() {
         when(client.loadFoodById(anyLong())).thenReturn(food);
-        FoodCommand storedFood = client.loadFoodById(food.getId());
+        Food storedFood = client.loadFoodById(food.getId());
         assertThat(storedFood).isEqualToComparingFieldByFieldRecursively(food);
     }
     
@@ -90,8 +90,8 @@ public class FridgeClientTests {
     
     @Test
     public void updateFood() {
-        when(client.updateFood(anyLong(), any(FoodCommand.class))).thenReturn(food);
-        FoodCommand updatedFood = client.updateFood(food.getId(), food);
+        when(client.updateFood(anyLong(), any(Food.class))).thenReturn(food);
+        Food updatedFood = client.updateFood(food.getId(), food);
         assertThat(updatedFood).isEqualToComparingFieldByFieldRecursively(food);
     }
     

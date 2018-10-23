@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.poseidon.member.model.MemberRequest;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment=WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment=WebEnvironment.MOCK, properties= {"eureka.client.enabled:false"})
 public class MemberClientTests {
     
     @MockBean

@@ -6,9 +6,17 @@ server:
 logging:
   level:
     org.springframework.security: DEBUG
+    com.poseidon.fridge.service.FridgeClient: DEBUG
 feign:
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
   client:
     config:
+      default:
+        loggerLevel: FULL
       fridge-member:
         errorDecoder: com.poseidon.config.MemberFeignErrorDecoder
       fridge-service:

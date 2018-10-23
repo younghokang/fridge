@@ -12,11 +12,12 @@ import javax.persistence.Id;
 
 import org.hibernate.annotations.NaturalId;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
+@Data
 @Entity
 public class Member {
     @Id
@@ -40,6 +41,7 @@ public class Member {
         this(username, password, null);
     }
     
+    @Builder
     public Member(String username, String password, Set<String> authorities) {
         this.username = username;
         this.password = password;

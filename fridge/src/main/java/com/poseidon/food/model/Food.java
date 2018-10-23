@@ -14,7 +14,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.poseidon.fridge.model.Fridge;
 
 import lombok.Builder;
@@ -34,7 +33,6 @@ public class Food {
     private LocalDate expiryDate;
     
     @ManyToOne
-    @JsonIgnore
     private Fridge fridge;
     
     private @CreatedDate LocalDateTime createdDate;
@@ -46,16 +44,17 @@ public class Food {
         this.name = name;
         this.quantity = quantity;
         this.expiryDate = expiryDate;
-        if(expiryDate == null) {
-            setDefaultExpiryDate();
-        }
         this.fridge = fridge;
     }
     
-    public static final int DEFAULT_EXPIRY_DAYS = 7;
-    
-    private void setDefaultExpiryDate() {
-        this.expiryDate = LocalDate.now().plusDays(DEFAULT_EXPIRY_DAYS);
+    public Integer getFridgeId() {
+        return fridge.getId();
+    }
+    public void setFridgeId(Integer fridgeId) {
+        if(fridge == null) {
+            fridge = new Fridge();
+        }
+        fridge.setId(fridgeId);
     }
     
 }

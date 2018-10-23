@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class FoodCommand {
+public class Food {
     
     private Long id;
     
@@ -34,6 +34,7 @@ public class FoodCommand {
     private LocalDate expiryDate;
     private Integer fridgeId;
     
+    @JsonIgnore
     public static final int SHOW_EXPIRY_D_DAYS = -3;
     
     @JsonIgnore
@@ -41,6 +42,7 @@ public class FoodCommand {
         return Period.between(getExpiryDate(), LocalDate.now()).getDays();
     }
     
+    @JsonIgnore
     public String showExpiryDDay() {
         if(getExpiryDays() >= SHOW_EXPIRY_D_DAYS) {
             if(getExpiryDays() == 0) {
@@ -55,12 +57,20 @@ public class FoodCommand {
     }
     
     @Builder
-    public FoodCommand(Long id, String name, Integer quantity, LocalDate expiryDate, Integer fridgeId) {
+    public Food(Long id, String name, Integer quantity, LocalDate expiryDate, Integer fridgeId) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
         this.expiryDate = expiryDate;
         this.fridgeId = fridgeId;
+    }
+    
+    @JsonIgnore
+    public static final int DEFAULT_EXPIRY_DAYS = 7;
+    
+    @JsonIgnore
+    public void setDefaultExpiryDate() {
+        this.expiryDate = LocalDate.now().plusDays(DEFAULT_EXPIRY_DAYS);
     }
 
 }

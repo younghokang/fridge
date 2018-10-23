@@ -32,16 +32,4 @@ public class FoodTests {
         assertThat(coke.getExpiryDate().toString()).isEqualTo("2018-10-30");
     }
 
-    @Test
-    public void createBuilderWithoutExpiryDate() {
-        Food food = Food.builder()
-                .name("파스퇴르 우유 1.8L")
-                .quantity(1)
-                .build();
-        
-        assertThat(food.getExpiryDate()).isNotNull();
-        assertThat(food.getExpiryDate()).isAfter(LocalDate.now());
-        assertThat(food.getExpiryDate()).isEqualTo(LocalDate.now().plusDays(Food.DEFAULT_EXPIRY_DAYS));
-    }
-    
 }

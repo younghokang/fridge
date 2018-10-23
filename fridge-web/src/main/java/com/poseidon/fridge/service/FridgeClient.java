@@ -1,35 +1,41 @@
 package com.poseidon.fridge.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.poseidon.food.command.FoodCommand;
-import com.poseidon.fridge.command.FridgeCommand;
+import com.poseidon.config.FeignConfig;
+import com.poseidon.food.command.Food;
+import com.poseidon.fridge.command.Fridge;
 
-@FeignClient(name="fridge-service")
+@FeignClient(name="fridge-service", configuration=FeignConfig.class)
 public interface FridgeClient {
     
-    @GetMapping("/fridges/me/{userId}")
-    FridgeCommand loadByUserId(@PathVariable("userId") long userId) throws NotFoundException;
+    @GetMapping("/fridges/search/findByUserId")
+    Fridge loadByUserId(@RequestParam("userId") long userId) throws NotFoundException;
+    
+    @GetMapping("/fridges/{id}/foods")
+    Resources<Food> loadFoodsByFridgeId(@PathVariable("id") int id);
     
     @PostMapping("/fridges")
-    FridgeCommand generate(FridgeCommand fridgeCommand);
+    Fridge generate(Fridge fridge);
     
     @DeleteMapping("/fridges")
     void deleteAll();
     
     @PostMapping("/foods")
-    FoodCommand createFood(FoodCommand foodCommand);
+    Food createFood(Food food);
     
     @GetMapping("/foods/{id}")
-    FoodCommand loadFoodById(@PathVariable("id") long id) throws NotFoundException;
+    Food loadFoodById(@PathVariable("id") long id) throws NotFoundException;
     
     @PutMapping("/foods/{id}")
-    FoodCommand updateFood(@PathVariable("id") long id, FoodCommand foodCommand);
+    Food updateFood(@PathVariable("id") long id, Food food);
     
     @DeleteMapping("/foods/{id}")
     void deleteFood(@PathVariable("id") long id);

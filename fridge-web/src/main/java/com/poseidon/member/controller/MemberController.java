@@ -3,6 +3,7 @@ package com.poseidon.member.controller;
 import javax.validation.Valid;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -83,7 +84,9 @@ public class MemberController {
             return "members/changePassword";
         }
         
+        memberRequest.setUsername(member.getUsername());
         memberRequest.setPassword(passwordEncoder.encode(memberRequest.getPassword()));
+        memberRequest.setAuthorities(AuthorityUtils.authorityListToSet(member.getAuthorities()));
         client.changePassword(member.getId(), memberRequest);
         
         redirectAttributes.addFlashAttribute("changePasswordDone", true);

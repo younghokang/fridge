@@ -1,5 +1,6 @@
 package com.poseidon.member.model;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,10 @@ public class MemberRequest {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
+    private String passwordToken;
+    private LocalDateTime passwordTokenExpireTime;
+    private int passwordTokenTry;
+    private String token;
     
     @Builder
     public MemberRequest(String username, String password) {

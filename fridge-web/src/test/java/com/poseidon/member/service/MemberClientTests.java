@@ -66,8 +66,8 @@ public class MemberClientTests {
     
     @Test
     public void changePassword() {
-        given(client.changePassword(anyLong(), any(MemberRequest.class))).willReturn(memberRequest);
-        MemberRequest member = client.changePassword(memberRequest.getId(), memberRequest);
+        given(client.changeMember(anyLong(), any(MemberRequest.class))).willReturn(memberRequest);
+        MemberRequest member = client.changeMember(memberRequest.getId(), memberRequest);
         assertThat(member).isEqualToComparingFieldByField(memberRequest);
     }
     

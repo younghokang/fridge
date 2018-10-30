@@ -21,7 +21,7 @@ public interface MemberClient {
     MemberRequest register(MemberRequest memberRequest);
     
     @PutMapping("/{id}")
-    MemberRequest changePassword(@PathVariable("id") long id, MemberRequest memberRequest);
+    MemberRequest changeMember(@PathVariable("id") long id, MemberRequest memberRequest);
     
     @DeleteMapping("/{username}")
     void withdraw(@PathVariable("username") String username);

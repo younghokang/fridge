@@ -1,5 +1,6 @@
 package com.poseidon.fridge.member.model;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +37,10 @@ public class Member {
     @ElementCollection
     @Column(name="authority")
     private Set<String> authorities = new HashSet<>();
+    
+    private String passwordToken;
+    private LocalDateTime passwordTokenExpireTime;
+    private int passwordTokenTry;
 
     public Member(String username, String password) {
         this(username, password, null);

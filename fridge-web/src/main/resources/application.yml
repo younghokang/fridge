@@ -1,18 +1,17 @@
 spring:
   application:
     name: fridge-ui
+  mail:
+    host: localhost
+    port: 2525
 server:
   port: 8083
 logging:
   level:
     org.springframework.security: DEBUG
     com.poseidon.fridge.service.FridgeClient: DEBUG
+    com.poseidon.fridge.service.MemberClient: DEBUG
 feign:
-  compression:
-    request:
-      enabled: true
-    response:
-      enabled: true
   client:
     config:
       default:
@@ -21,3 +20,7 @@ feign:
         errorDecoder: com.poseidon.config.MemberFeignErrorDecoder
       fridge-service:
         errorDecoder: com.poseidon.config.FridgeFeignErrorDecoder
+noti:
+  sender: no-reply@fridge.com
+  token-expire-time: 15
+  token-try-limit: 5

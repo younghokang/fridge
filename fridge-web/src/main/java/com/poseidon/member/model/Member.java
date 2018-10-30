@@ -32,11 +32,11 @@ public class Member implements UserDetails {
         this.enabled = enabled;
         this.authorities = authorities;
     }
-
+    
     public Long getId() {
         return id;
     }
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;

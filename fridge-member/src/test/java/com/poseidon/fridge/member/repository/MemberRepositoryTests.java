@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,12 @@ public class MemberRepositoryTests {
         String username = "user";
         Set<String> authorities = new HashSet<>();
         authorities.add("ROLE_USER");
-        Member newMember = repository.save(new Member(username, "password", authorities));
+        Member newMember = new Member(username, "password", authorities);
+        newMember.setPasswordToken(RandomStringUtils.randomAlphanumeric(20));
+        repository.save(newMember);
         assertThat(newMember).isNotNull();
         assertThat(newMember.getId()).isPositive();
+        assertThat(newMember.getPasswordToken()).isNotNull();
         
         Member member = repository.findByUsername(username)
                 .orElse(null);
@@ -41,6 +45,7 @@ public class MemberRepositoryTests {
         
         assertThat(member.getAuthorities().size()).isEqualTo(authorities.size());
         assertThat(member.getAuthorities()).containsOnly("ROLE_USER");
+        
     }
 
 }

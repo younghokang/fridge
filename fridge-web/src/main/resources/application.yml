@@ -5,12 +5,13 @@ spring:
     host: localhost
     port: 2525
 server:
-  port: 8083
+  port: 8080
 logging:
   level:
     org.springframework.security: DEBUG
     com.poseidon.fridge.service.FridgeClient: DEBUG
-    com.poseidon.fridge.service.MemberClient: DEBUG
+    com.poseidon.member.service.MemberClient: DEBUG
+    com.poseidon.search.service.SearchClient: DEBUG
 feign:
   client:
     config:

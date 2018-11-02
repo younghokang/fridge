@@ -22,7 +22,7 @@
             <input type="hidden" th:field="*{fridgeId}" />
             <div class="mb-3">
               <label for="name">식품명:</label> 
-              <input type="text" class="form-control" th:field="*{name}" th:errorclass="is-invalid" />
+              <input type="text" class="form-control typeahead" th:field="*{name}" th:errorclass="is-invalid" autocomplete="off" />
               <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">식품명을 올바르게 입력해주세요.</div>
             </div>
             <div class="mb-3">
@@ -40,6 +40,19 @@
           </form>
         </div>
       </div>
+    </div>
+    <div layout:fragment="javascript">
+    <script>
+        $(function() {
+            $(".typeahead").typeahead({
+                source: function(query, process) {
+                    return $.get("/searchProductName", {query: query}, function(data) {
+                        return process(data);
+                    });
+                }
+            });
+        });
+    </script>
     </div>
 </body>
 </html>

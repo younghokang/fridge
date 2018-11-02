@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poseidon.food.command.Food;
 import com.poseidon.fridge.service.FridgeClient;
+import com.poseidon.search.service.SearchClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FoodController {
     private final FridgeClient client;
+    private final SearchClient searchClient;
     
     @GetMapping("/add")
     public String registerFoodForm(Food food, Model model) {
@@ -47,6 +49,7 @@ public class FoodController {
         }
         
         if(client.createFood(food) != null) {
+            searchClient.increaseScore(food.getName());
             ra.addFlashAttribute("message", "식품을 저장했습니다.");
             sessionStatus.setComplete();
         }

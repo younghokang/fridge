@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.poseidon.food.command.Food;
 import com.poseidon.fridge.service.FridgeClient;
+import com.poseidon.search.command.Category;
 import com.poseidon.search.service.SearchClient;
 
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,11 @@ public class FoodController {
             food.setDefaultExpiryDate();
         }
         
+        Category category = searchClient.classifyCategories(food.getName());
+        if(category != null) {
+            food.setCategoryId(category.getId());
+        }
+        
         if(client.createFood(food) != null) {
             searchClient.increaseScore(food.getName());
             ra.addFlashAttribute("message", "식품을 저장했습니다.");
@@ -61,7 +67,11 @@ public class FoodController {
             @PathVariable long id, Model model) {
         Food food = client.loadFoodById(id);
         food.setFridgeId(fridgeId);
+        if(food.getCategoryId() != null) {
+            food.setCategory(searchClient.findCategoryById(food.getCategoryId()));
+        }
         model.addAttribute("food", food);
+        model.addAttribute("categories", searchClient.categoryNames());
         return "foods/updateFoodForm";
     }
     

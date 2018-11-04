@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 
+import com.poseidon.fridge.category.CategoryClassifier;
+import com.poseidon.fridge.category.repository.CategoryRepository;
 import com.poseidon.fridge.search.productname.ProductNameTrie;
 import com.poseidon.fridge.search.productname.repository.ProductNameRepository;
 
@@ -22,6 +24,13 @@ public class FridgeSearchApplication {
 	    productRepository.findAll().stream()
             .forEach(product -> trie.put(product.getName(), product.getScore()));
 	    return trie;
+	}
+	
+	@Bean
+	public CategoryClassifier categoryClassifier(CategoryRepository categoryRepository) {
+	    CategoryClassifier classifier = new CategoryClassifier();
+	    classifier.addAll(categoryRepository.findAll());
+	    return classifier;
 	}
 	
 }

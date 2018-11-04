@@ -32,6 +32,7 @@ public class Food extends BaseEntity {
     
     @ManyToOne
     private Fridge fridge;
+    private Long categoryId;
     
     @Builder
     public Food(Long id, String name, int quantity, LocalDate expiryDate, Fridge fridge) {

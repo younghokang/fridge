@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.poseidon.search.command.Category;
 
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class Food {
     private Long id;
     
     @NotNull
-    @Size(min=1, max=20)
+    @Size(min=1, max=40)
     private String name;
     
     @Min(1)
@@ -33,6 +34,10 @@ public class Food {
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate expiryDate;
     private Integer fridgeId;
+    private Long categoryId;
+    
+    @JsonIgnore
+    private Category category;
     
     @JsonIgnore
     public static final int SHOW_EXPIRY_D_DAYS = -3;

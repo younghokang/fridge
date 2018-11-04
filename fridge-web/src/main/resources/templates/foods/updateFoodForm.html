@@ -26,6 +26,14 @@
               <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">식품명을 올바르게 입력해주세요.</div>
             </div>
             <div class="mb-3">
+                <label for="categoryId">카테고리:</label>
+                <select class="form-control" th:field="*{categoryId}">
+                    <option th:each="category : ${categories}" 
+                            th:value="${category.id}"
+                            th:text="${category.name}">과일</option>
+                </select>
+            </div>
+            <div class="mb-3">
               <label for="quantity">수량:</label>
               <input type="text" class="form-control" th:field="*{quantity}" th:errorclass="is-invalid" />
               <div class="invalid-feedback" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">수량을 올바르게 입력해주세요.</div>

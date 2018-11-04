@@ -23,39 +23,41 @@
           <p class="card-text">식품 추가하기 버튼을 눌러서 보관하실 식품을 추가해보세요!</p>
           <a class="btn btn-primary btn-lg" role="button" th:href="@{/fridges/{fridgeId}/foods/add(fridgeId=${fridge.id})}" id="btnRegistrationFood">식품 추가하기</a>
         </div>
-        <table class="table" th:if="${not #lists.isEmpty(fridge.foods)}">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">식품명</th>
-              <th scope="col">수량</th>
-              <th scope="col">유통기한</th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="food, foodStat : ${fridge.foods}">
-              <td th:text="${foodStat.count}">number</td>
-              <td><a class="btn btn-sm btn-outline-dark" th:href="@{/fridges/{fridgeId}/foods/{id}(fridgeId=${fridge.id},id=${food.id})}" th:text="${food.name}">name</a></td>
-              <td th:text="${food.quantity}">1</td>
-              <td th:class="${food.getExpiryDays() ge food.SHOW_EXPIRY_D_DAYS}? 'text-danger'" th:text="${#objects.nullSafe(food.showExpiryDDay(), #temporals.format(food.expiryDate, 'yyyy-MM-dd'))}">2018-09-09</td>
-              <td>
-                <a class="btn btn-outline-dark btn-sm" role="button" th:href="@{/fridges/{fridgeId}/foods/delete/{id}(fridgeId=${fridge.id},id=${food.id})}">
-                  <i class="fas fa-minus"></i>
-                </a>
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="5">
-                <a class="btn btn-outline-info btn-block" role="button" th:href="@{/fridges/{fridgeId}/foods/add(fridgeId=${fridge.id})}" id="btnRegistrationFood">
-                    <i class="fas fa-plus"></i> 식품 추가하기
-                </a>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
+        <div class="table-responsive" th:if="${not #lists.isEmpty(fridge.foods)}">
+	        <table class="table">
+	          <thead>
+	            <tr>
+	              <th scope="col">#</th>
+	              <th scope="col">식품명</th>
+	              <th scope="col">수량</th>
+	              <th scope="col">유통기한</th>
+	              <th scope="col"></th>
+	            </tr>
+	          </thead>
+	          <tbody>
+	            <tr th:each="food, foodStat : ${fridge.foods}">
+	              <td th:text="${foodStat.count}">number</td>
+	              <td><a class="btn btn-sm btn-outline-dark" th:href="@{/fridges/{fridgeId}/foods/{id}(fridgeId=${fridge.id},id=${food.id})}" th:text="${food.name}">name</a></td>
+	              <td th:text="${food.quantity}">1</td>
+	              <td th:class="${food.getExpiryDays() ge food.SHOW_EXPIRY_D_DAYS}? 'text-danger'" th:text="${#objects.nullSafe(food.showExpiryDDay(), #temporals.format(food.expiryDate, 'yyyy-MM-dd'))}">2018-09-09</td>
+	              <td>
+	                <a class="btn btn-outline-dark btn-sm" role="button" th:href="@{/fridges/{fridgeId}/foods/delete/{id}(fridgeId=${fridge.id},id=${food.id})}">
+	                  <i class="fas fa-minus"></i>
+	                </a>
+	              </td>
+	            </tr>
+	          </tbody>
+	          <tfoot>
+	            <tr>
+	              <td colspan="5">
+	                <a class="btn btn-outline-info btn-block" role="button" th:href="@{/fridges/{fridgeId}/foods/add(fridgeId=${fridge.id})}" id="btnRegistrationFood">
+	                    <i class="fas fa-plus"></i> 식품 추가하기
+	                </a>
+	              </td>
+	            </tr>
+	          </tfoot>
+	        </table>
+        </div>
       </div>
     </div>
 </body>
